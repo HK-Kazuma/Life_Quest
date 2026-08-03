@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>冒険の書</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main-area">
+      <nav class="tabs">
+        <button class="tab-button" data-screen="goal">① 目標設定</button>
+        <button class="tab-button" data-screen="log">② 活動記録</button>
+        <button class="tab-button" data-screen="history">③ 履歴</button>
+      </nav>
+      <section id="screen-content" class="screen-content"></section>
+    </main>
+  </div>
+
+  <div id="levelup-overlay" class="levelup-overlay hidden">
+    <div class="levelup-box">
+      <div class="levelup-title">LEVEL UP!</div>
+      <div id="levelup-detail" class="levelup-detail"></div>
+    </div>
+  </div>
+
+  <script src="js/config.example.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/sprite.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/goalScreen.js"></script>
+  <script src="js/logScreen.js"></script>
+  <script src="js/historyScreen.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

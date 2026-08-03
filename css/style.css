@@ -1,0 +1,512 @@
+:root {
+  --dq-bg: #0a0a2e;
+  --dq-box: #10105a;
+  --dq-border-outer: #f8f8f8;
+  --dq-border-inner: #7878d8;
+  --dq-text: #f8f8f8;
+  --dq-accent: #ffd700;
+  --dq-danger: #ff6b6b;
+  --dq-hp: #4ade80;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--dq-bg);
+  color: var(--dq-text);
+  font-family: "DotGothic16", "MS Gothic", monospace, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+/* ---------- レイアウト ---------- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sidebar {
+  flex: 0 0 260px;
+  background: var(--dq-box);
+  border: 4px solid var(--dq-border-outer);
+  box-shadow: inset 0 0 0 2px var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 16px;
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dq-border-inner) var(--dq-box);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--dq-box);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--dq-border-inner);
+  border-radius: 4px;
+}
+
+.main-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- タブ ---------- */
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-button {
+  flex: 1;
+  background: var(--dq-box);
+  color: var(--dq-text);
+  border: 3px solid var(--dq-border-outer);
+  box-shadow: inset 0 0 0 1px var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 12px 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.tab-button:hover {
+  opacity: 0.85;
+}
+
+.tab-button.active {
+  opacity: 1;
+  background: #1c1c7a;
+  transform: translateY(-2px);
+}
+
+.screen-content {
+  flex: 1;
+}
+
+.screen-panel {
+  background: var(--dq-box);
+  border: 4px solid var(--dq-border-outer);
+  box-shadow: inset 0 0 0 2px var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.screen-title {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+  color: var(--dq-accent);
+}
+
+.screen-desc {
+  margin: 0 0 16px;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+/* ---------- キャラクターパネル ---------- */
+.sprite-frame {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.sprite-svg {
+  image-rendering: pixelated;
+}
+
+.char-name {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--dq-accent);
+}
+
+.char-level {
+  text-align: center;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.exp-bar {
+  position: relative;
+  height: 18px;
+  background: #05051a;
+  border: 2px solid var(--dq-border-outer);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.exp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  transition: width 0.3s ease;
+}
+
+.exp-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.streak-badge {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--dq-accent);
+  margin-bottom: 12px;
+}
+
+.status-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  border-top: 1px dashed var(--dq-border-inner);
+}
+
+.status-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+  border-bottom: 1px dashed var(--dq-border-inner);
+  font-size: 0.85rem;
+}
+
+.status-list .label {
+  opacity: 0.75;
+}
+
+.detail-toggle-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--dq-text);
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 6px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.detail-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.detail-panel.hidden {
+  display: none;
+}
+
+.todo-section {
+  margin-top: 12px;
+}
+
+.todo-title {
+  color: var(--dq-accent);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.todo-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.todo-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px;
+  font-size: 0.8rem;
+  border-bottom: 1px dashed var(--dq-border-inner);
+}
+
+/* ---------- フォーム系 共通 ---------- */
+.goal-add-row,
+.todo-add-row {
+  display: flex;
+  gap: 6px;
+}
+
+input[type="text"],
+textarea,
+select {
+  background: #05051a;
+  color: var(--dq-text);
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 3px;
+  padding: 6px 8px;
+  flex: 1;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+button {
+  background: var(--dq-box);
+  color: var(--dq-text);
+  border: 2px solid var(--dq-border-outer);
+  border-radius: 3px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1c1c7a;
+}
+
+.primary-btn {
+  background: #1c1c7a;
+  border-color: var(--dq-accent);
+  color: var(--dq-accent);
+  font-weight: bold;
+}
+
+.secondary-btn {
+  margin-bottom: 12px;
+}
+
+.goal-list,
+.saved-log-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.goal-list li,
+.saved-log-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 6px;
+  border-bottom: 1px dashed var(--dq-border-inner);
+}
+
+.empty-hint {
+  opacity: 0.6;
+  font-style: italic;
+  list-style: none;
+  padding: 8px 2px;
+}
+
+.goal-remove-btn,
+.todo-remove-btn,
+.remove-draft-btn {
+  background: transparent;
+  border: none;
+  color: var(--dq-danger);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+}
+
+/* ---------- 活動記録画面 ---------- */
+.saved-logs {
+  margin-bottom: 12px;
+}
+
+.saved-logs-title {
+  color: var(--dq-accent);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.log-detail {
+  opacity: 0.8;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.linked-goal-tag {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-left: 6px;
+}
+
+.goal-chips-section {
+  margin-bottom: 12px;
+}
+
+.goal-chips-label {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-bottom: 6px;
+}
+
+.goal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.goal-chip {
+  background: transparent;
+  border: 2px dashed var(--dq-border-inner);
+  color: var(--dq-accent);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.goal-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-style: solid;
+}
+
+.draft-log-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.draft-log-row input[type="text"] {
+  flex: 1 1 160px;
+}
+
+.draft-log-row select {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.notice-section {
+  margin: 16px 0;
+}
+
+.notice-label {
+  display: block;
+  color: var(--dq-accent);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* ---------- 履歴画面 ---------- */
+.history-entry {
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+}
+
+.history-entry summary {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.history-date {
+  color: var(--dq-accent);
+}
+
+.history-exp {
+  opacity: 0.85;
+}
+
+.history-body {
+  margin-top: 10px;
+}
+
+.history-section {
+  margin-bottom: 10px;
+}
+
+.history-section-title {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-bottom: 4px;
+}
+
+.history-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* ---------- レベルアップ演出 ---------- */
+.levelup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.levelup-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.levelup-box {
+  background: var(--dq-box);
+  border: 4px solid var(--dq-accent);
+  box-shadow: inset 0 0 0 2px var(--dq-border-inner);
+  border-radius: 6px;
+  padding: 32px 48px;
+  text-align: center;
+  animation: levelup-pop 0.4s ease;
+}
+
+.levelup-title {
+  font-size: 2rem;
+  color: var(--dq-accent);
+  text-shadow: 2px 2px 0 #000;
+  margin-bottom: 8px;
+}
+
+.levelup-detail {
+  font-size: 1.1rem;
+}
+
+@keyframes levelup-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ---------- レスポンシブ ---------- */
+@media (max-width: 720px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    flex: none;
+    width: 100%;
+    position: static;
+  }
+}
