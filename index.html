@@ -24,6 +24,7 @@
           <button class="tab-button" data-screen="goal">① 目標設定</button>
           <button class="tab-button" data-screen="log">② 活動記録</button>
           <button class="tab-button" data-screen="history">③ 履歴</button>
+          <button class="tab-button" data-screen="reset">④ リセット</button>
         </nav>
         <section id="screen-content" class="screen-content"></section>
       </div>
@@ -50,6 +51,10 @@
     <div class="modal-box" id="job-browser-box"></div>
   </div>
 
+  <div id="reset-confirm-overlay" class="modal-overlay hidden">
+    <div class="modal-box" id="reset-confirm-box"></div>
+  </div>
+
   <script src="js/config.example.js"></script>
   <script src="js/config.js"></script>
   <script src="js/storage.js"></script>
@@ -61,6 +66,7 @@
   <script src="js/goalScreen.js"></script>
   <script src="js/logScreen.js"></script>
   <script src="js/historyScreen.js"></script>
+  <script src="js/resetScreen.js"></script>
   <script src="js/widgets.js"></script>
   <script src="js/main.js"></script>
 </body>

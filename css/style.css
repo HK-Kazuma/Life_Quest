@@ -568,6 +568,21 @@ button:hover {
   margin-bottom: 12px;
 }
 
+.danger-btn {
+  background: transparent;
+  border-color: var(--dq-danger);
+  color: var(--dq-danger);
+  font-weight: bold;
+}
+
+.danger-btn:hover {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.reset-panel-spacer {
+  min-height: 40vh;
+}
+
 .goal-list,
 .saved-log-list {
   list-style: none;
