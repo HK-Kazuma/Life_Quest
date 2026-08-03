@@ -2,7 +2,7 @@
 // 実際の個人情報は js/config.js に書き、.gitignore で除外すること。
 window.APP_CONFIG = {
   name: "なまえ",
-  job: "みならい冒険者",
+  job: "見習い冒険者",
   gender: "未設定",
   sport: "なし",
   specialty: "なし",

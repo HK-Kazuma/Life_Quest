@@ -26,7 +26,7 @@
         <span class="exp-bar-label">${c.currentExp} / ${needed} EXP</span>
       </div>
 
-      <div class="streak-badge">連続記録 ${c.streak} 日</div>
+      <button id="edit-status-btn" class="edit-status-btn">✎ ステータスを編集する</button>
 
       <ul class="status-list">
         <li><span class="label">職業</span><span class="value">${escapeHtml(c.job)}</span></li>
@@ -74,6 +74,10 @@
     document.getElementById("todo-add-btn").addEventListener("click", () => addTodo(state));
     document.getElementById("todo-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") addTodo(state);
+    });
+
+    document.getElementById("edit-status-btn").addEventListener("click", () => {
+      window.StatusEditModal.open(state);
     });
   }
 

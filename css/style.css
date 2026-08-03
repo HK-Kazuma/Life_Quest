@@ -240,7 +240,11 @@ button, input, textarea, select {
 
 .streak-watermark {
   position: absolute;
-  inset: 10%;
+  left: 50%;
+  top: 50%;
+  width: 70%;
+  aspect-ratio: 286 / 308;
+  transform: translate(-50%, -50%);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -436,11 +440,20 @@ button, input, textarea, select {
   text-shadow: 1px 1px 0 #000;
 }
 
-.streak-badge {
-  text-align: center;
-  font-size: 1rem;
+.edit-status-btn {
+  width: 100%;
+  background: transparent;
   color: var(--dq-accent);
+  border: 2px solid var(--dq-accent);
+  border-radius: 4px;
+  padding: 7px;
+  cursor: pointer;
   margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.edit-status-btn:hover {
+  background: rgba(255, 215, 0, 0.12);
 }
 
 .status-list {
@@ -755,6 +768,190 @@ button:hover {
   0% { transform: scale(0.6); opacity: 0; }
   60% { transform: scale(1.08); opacity: 1; }
   100% { transform: scale(1); }
+}
+
+/* ---------- 汎用モーダル（ステータス編集・職業一覧） ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  padding: 24px;
+}
+
+.job-browser-overlay {
+  z-index: 160;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: var(--dq-box);
+  border: 4px solid var(--dq-border-outer);
+  box-shadow: inset 0 0 0 2px var(--dq-border-inner), 0 12px 32px rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  animation: levelup-pop 0.25s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dq-border-inner) var(--dq-box);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  margin: 0;
+  color: var(--dq-accent);
+  font-size: 1.2rem;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: 2px solid var(--dq-border-inner);
+  color: var(--dq-text);
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.status-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.form-label {
+  flex: 0 0 130px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.form-row input[type="text"] {
+  flex: 1;
+}
+
+.form-divider {
+  margin: 8px 0 2px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--dq-border-inner);
+  color: var(--dq-accent);
+  font-size: 0.85rem;
+}
+
+.job-field-btn {
+  flex: 1;
+  background: #05051a;
+  color: var(--dq-text);
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 3px;
+  padding: 6px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.job-field-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.job-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.job-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 8px;
+  border-bottom: 1px dashed var(--dq-border-inner);
+}
+
+.job-item.unlocked {
+  color: var(--dq-text);
+  cursor: pointer;
+}
+
+.job-item.unlocked:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.job-item.locked {
+  color: #888;
+  cursor: default;
+}
+
+.job-item-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.job-grade {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  flex: 0 0 auto;
+}
+
+.job-name {
+  font-weight: bold;
+  flex: 1;
+}
+
+.job-level {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  flex: 0 0 auto;
+}
+
+.job-desc {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.job-desc-line + .job-desc-line {
+  margin-top: 2px;
+}
+
+.job-desc-key {
+  opacity: 0.8;
+  margin-right: 2px;
+}
+
+#job-browser-box {
+  max-width: 620px;
 }
 
 /* ---------- レスポンシブ ---------- */

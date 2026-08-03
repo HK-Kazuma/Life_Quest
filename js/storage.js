@@ -7,7 +7,7 @@
     return {
       character: {
         name: cfg.name || "名もなき冒険者",
-        job: cfg.job || "みならい冒険者",
+        job: cfg.job || "見習い冒険者",
         gender: cfg.gender || "-",
         sport: cfg.sport || "-",
         specialty: cfg.specialty || "-",
