@@ -28,15 +28,73 @@
     window.Storage.saveState(state);
   }
 
+  function getEntryForDate(dateStr) {
+    return state.history.find((h) => h.date === dateStr);
+  }
+
+  function getOrCreateEntryForDate(dateStr) {
+    let entry = getEntryForDate(dateStr);
+    if (!entry) {
+      entry = { date: dateStr, goals: [], logs: [], notice: "", expGained: 0 };
+      state.history.push(entry);
+    }
+    return entry;
+  }
+
   function getTodayEntry(createIfMissing) {
     const today = todayStr();
-    let entry = state.history.find((h) => h.date === today);
+    let entry = getEntryForDate(today);
     if (!entry && createIfMissing) {
-      entry = { date: today, goals: [], logs: [], notice: "", expGained: 0 };
-      state.history.push(entry);
+      entry = getOrCreateEntryForDate(today);
       window.App.persist();
     }
     return entry;
+  }
+
+  function shiftDateStr(dateStr, deltaDays) {
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + deltaDays);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  // 過去日の活動記録を直接編集した後などに、履歴データからストリークを実データベースで再計算する。
+  function recomputeStreak() {
+    const activeDates = new Set(
+      state.history.filter((h) => h.logs && h.logs.length > 0).map((h) => h.date)
+    );
+
+    let lastLogDate = null;
+    activeDates.forEach((d) => {
+      if (!lastLogDate || d > lastLogDate) lastLogDate = d;
+    });
+
+    let streak = 0;
+    if (lastLogDate) {
+      let cursor = lastLogDate;
+      while (activeDates.has(cursor)) {
+        streak++;
+        cursor = shiftDateStr(cursor, -1);
+      }
+    }
+
+    let longestStreak = 0;
+    let run = 0;
+    let prevDate = null;
+    Array.from(activeDates)
+      .sort()
+      .forEach((d) => {
+        run = prevDate && daysBetween(prevDate, d) === 1 ? run + 1 : 1;
+        longestStreak = Math.max(longestStreak, run);
+        prevDate = d;
+      });
+
+    const character = state.character;
+    character.streak = streak;
+    character.longestStreak = longestStreak;
+    character.lastLogDate = lastLogDate;
   }
 
   function updateStreakOnLog() {
@@ -152,9 +210,13 @@
     getState,
     persist,
     todayStr,
+    daysBetween,
     neededForLevel,
     getTodayEntry,
+    getEntryForDate,
+    getOrCreateEntryForDate,
     updateStreakOnLog,
+    recomputeStreak,
     addExp,
     showLevelUp,
     rerenderSidebar,

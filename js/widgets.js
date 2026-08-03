@@ -54,6 +54,7 @@
     const currentStreak = state.character.streak || 0;
     const longestStreak = state.character.longestStreak || 0;
 
+    const todayStr = toDateStr(new Date());
     const cells = [];
     const today = new Date();
     for (let i = CALENDAR_DAYS - 1; i >= 0; i--) {
@@ -61,7 +62,7 @@
       d.setDate(d.getDate() - i);
       const dateStr = toDateStr(d);
       const tier = dayTier(historyByDate[dateStr]);
-      cells.push({ dateStr, tier });
+      cells.push({ dateStr, tier, isToday: dateStr === todayStr });
     }
 
     box.innerHTML = `
@@ -81,10 +82,21 @@
       </div>
       <div class="calendar-grid">
         ${cells
-          .map((c) => `<div class="calendar-cell tier-${c.tier}" title="${c.dateStr}"></div>`)
+          .map(
+            (c) =>
+              `<div class="calendar-cell tier-${c.tier}${
+                c.isToday ? " is-today" : ""
+              }" data-date="${c.dateStr}" title="${c.dateStr}"></div>`
+          )
           .join("")}
       </div>
     `;
+
+    box.querySelectorAll(".calendar-cell:not(.is-today)").forEach((cell) => {
+      cell.addEventListener("click", () => {
+        window.DayDetailModal.open(cell.dataset.date, state);
+      });
+    });
   }
 
   function render(state) {

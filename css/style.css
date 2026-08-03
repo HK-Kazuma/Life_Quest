@@ -322,6 +322,24 @@ button, input, textarea, select {
   aspect-ratio: 1;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: outline 0.1s, transform 0.1s;
+}
+
+.calendar-cell:hover {
+  outline: 2px solid var(--dq-accent);
+  transform: scale(1.08);
+  z-index: 1;
+}
+
+.calendar-cell.is-today {
+  cursor: default;
+  outline: 2px solid var(--dq-text);
+}
+
+.calendar-cell.is-today:hover {
+  outline: 2px solid var(--dq-text);
+  transform: none;
 }
 
 .calendar-cell.tier-recorded {
@@ -744,6 +762,13 @@ button:hover {
 .history-section ul {
   margin: 0;
   padding-left: 20px;
+}
+
+/* ---------- カレンダー：日別記録ポップアップ ---------- */
+.day-detail-note {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin: 0 0 12px;
 }
 
 /* ---------- レベルアップ演出 ---------- */
