@@ -397,8 +397,13 @@ button, input, textarea, select {
   margin-bottom: 8px;
 }
 
-.sprite-svg {
+.sprite-img {
+  width: 130px;
+  height: auto;
   image-rendering: pixelated;
+  border: 3px solid #8a8a8a;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--dq-border-inner);
 }
 
 .char-name {
