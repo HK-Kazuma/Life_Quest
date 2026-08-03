@@ -30,8 +30,10 @@
         municipalCerts: cfg.municipalCerts ?? 0,
       },
       todoList: [],
-      // history entry: { date, goals: string[], logs: {activity, detail, linkedGoal?}[], notice, expGained }
+      // history entry: { date, goals: string[], logs: {activity, detail, tags: string[]}[], notice, expGained }
       history: [],
+      // tag: { id, name, color }
+      tags: [],
     };
   }
 
@@ -41,6 +43,7 @@
       try {
         const parsed = JSON.parse(raw);
         if (parsed && parsed.character && parsed.history) {
+          if (!parsed.tags) parsed.tags = [];
           return parsed;
         }
       } catch (e) {

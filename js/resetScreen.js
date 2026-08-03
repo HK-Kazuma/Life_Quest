@@ -6,6 +6,7 @@
         <h2 class="screen-title">④ リセット</h2>
         <p class="screen-desc">
           これまでの活動記録の履歴をすべて消去します。連続ストリークとカレンダーの記録も同時にリセットされます。<br />
+          レベルも1に戻り、それまでに獲得した職業もリセットされます。<br />
           この操作は取り消せません。
         </p>
         <div class="reset-panel-spacer"></div>
@@ -27,7 +28,7 @@
         <h3 class="modal-title">本当にリセットしますか？</h3>
         <button type="button" class="modal-close-btn" id="reset-confirm-close">✕</button>
       </div>
-      <p>活動記録の履歴・連続ストリーク・カレンダーの記録がすべて消去されます。この操作は取り消せません。</p>
+      <p>活動記録の履歴・連続ストリーク・カレンダーの記録がすべて消去されます。レベルも1に戻り、獲得済みの職業もリセットされます。この操作は取り消せません。</p>
       <div class="modal-actions">
         <button type="button" class="secondary-btn" id="reset-confirm-cancel">キャンセル</button>
         <button type="button" class="danger-btn" id="reset-confirm-ok">リセットする</button>
@@ -58,6 +59,12 @@
     state.character.streak = 0;
     state.character.longestStreak = 0;
     state.character.lastLogDate = null;
+
+    // レベルを1に戻すと、レベルに応じて解放される職業も見習い冒険者まで巻き戻る。
+    state.character.level = 1;
+    state.character.currentExp = 0;
+    state.character.totalExp = 0;
+    state.character.job = window.Jobs.JOBS[0].name;
 
     window.App.persist();
     window.App.rerenderSidebar();

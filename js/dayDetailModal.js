@@ -23,18 +23,19 @@
     const box = document.getElementById("day-detail-box");
     const entry = window.App.getEntryForDate(dateStr);
     const editable = isEditableDate(dateStr);
+    // 保存時にEXPを付与するのは、このモーダルを開いた時点でまだ無かった活動・気づきの分だけ
+    // （同じ内容を何度保存し直してもEXPが増え続けないようにするため）。
+    const initialLogCount = entry ? entry.logs.length : 0;
+    const initialHadNotice = !!(entry && entry.notice);
 
     draftRows =
       entry && entry.logs.length > 0
         ? entry.logs.map((log) => ({
             activity: log.activity,
             detail: log.detail || "",
-            goalIdx:
-              log.linkedGoal && entry.goals
-                ? String(entry.goals.indexOf(log.linkedGoal))
-                : "",
+            tags: log.tags ? log.tags.slice() : [],
           }))
-        : [{ activity: "", detail: "", goalIdx: "" }];
+        : [{ activity: "", detail: "", tags: [] }];
 
     function close() {
       overlay.classList.add("hidden");
@@ -62,11 +63,10 @@
             logs.length
               ? `<div class="history-section"><div class="history-section-title">活動</div><ul>${logs
                   .map(
-                    (log) => `<li><strong>${escapeHtml(log.activity)}</strong>${
-                      log.linkedGoal
-                        ? `<span class="linked-goal-tag">→ ${escapeHtml(log.linkedGoal)}</span>`
-                        : ""
-                    }${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}</li>`
+                    (log) => `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(
+                      log.tags,
+                      window.App.getTags()
+                    )}${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}</li>`
                   )
                   .join("")}</ul></div>`
               : ""
@@ -92,21 +92,28 @@
       document.getElementById("day-detail-close-btn").addEventListener("click", close);
     }
 
-    function renderDraftRows(goals, goalOptions) {
+    function renderDraftRows() {
       const rowsBox = document.getElementById("day-detail-draft-logs");
       if (!rowsBox) return;
+      const tags = window.App.getTags();
+      const tagMap = window.TagsUtil.tagsById(tags);
+
       rowsBox.innerHTML = draftRows
-        .map(
-          (row, idx) => `
+        .map((row, idx) => {
+          const chipsHtml = row.tags
+            .map((tagId) => {
+              const t = tagMap[tagId];
+              if (!t) return "";
+              return `<span class="tag-chip" style="background:${t.color};color:${window.TagsUtil.contrastColor(
+                t.color
+              )}">${escapeHtml(t.name)}<button type="button" class="tag-chip-remove" data-row="${idx}" data-tag="${tagId}">✕</button></span>`;
+            })
+            .join("");
+          return `
           <div class="draft-log-row" data-idx="${idx}">
             <input type="text" class="dd-draft-activity" placeholder="活動名（例: ランニング）" value="${escapeHtml(
               row.activity
             )}" />
-            ${
-              goals.length
-                ? `<select class="dd-draft-goal-select"><option value="">目標と紐づけ（任意）</option>${goalOptions}</select>`
-                : ""
-            }
             <input type="text" class="dd-draft-detail" placeholder="詳細：何を強化した？何を学んだ？" value="${escapeHtml(
               row.detail
             )}" />
@@ -115,8 +122,12 @@
                 ? `<button type="button" class="remove-draft-btn" data-idx="${idx}">×</button>`
                 : ""
             }
-          </div>`
-        )
+            <div class="draft-tags-row">
+              ${chipsHtml}
+              ${row.tags.length < 3 ? `<button type="button" class="tag-add-btn" data-row="${idx}">＋ タグ</button>` : ""}
+            </div>
+          </div>`;
+        })
         .join("");
 
       rowsBox.querySelectorAll(".dd-draft-activity").forEach((input, i) => {
@@ -125,15 +136,35 @@
       rowsBox.querySelectorAll(".dd-draft-detail").forEach((input, i) => {
         input.addEventListener("input", () => (draftRows[i].detail = input.value));
       });
-      rowsBox.querySelectorAll(".dd-draft-goal-select").forEach((sel, i) => {
-        if (draftRows[i].goalIdx) sel.value = draftRows[i].goalIdx;
-        sel.addEventListener("change", () => (draftRows[i].goalIdx = sel.value));
-      });
       rowsBox.querySelectorAll(".remove-draft-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           const idx = Number(btn.dataset.idx);
           draftRows.splice(idx, 1);
-          renderDraftRows(goals, goalOptions);
+          renderDraftRows();
+        });
+      });
+      rowsBox.querySelectorAll(".tag-add-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.row);
+          window.TagPickerModal.open({
+            attachedIds: draftRows[idx].tags,
+            onAttach: (tagId) => {
+              draftRows[idx].tags.push(tagId);
+              renderDraftRows();
+            },
+            onTagDeleted: (tagId) => {
+              draftRows.forEach((r) => (r.tags = r.tags.filter((id) => id !== tagId)));
+              renderDraftRows();
+            },
+          });
+        });
+      });
+      rowsBox.querySelectorAll(".tag-chip-remove").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.row);
+          const tagId = btn.dataset.tag;
+          draftRows[idx].tags = draftRows[idx].tags.filter((id) => id !== tagId);
+          renderDraftRows();
         });
       });
     }
@@ -144,28 +175,43 @@
       const validRows = draftRows.filter((r) => r.activity.trim() !== "");
 
       const liveEntry = window.App.getOrCreateEntryForDate(dateStr);
-      liveEntry.logs = validRows.map((row) => {
-        const logEntry = { activity: row.activity.trim(), detail: row.detail.trim() };
-        if (row.goalIdx !== "" && liveEntry.goals[Number(row.goalIdx)]) {
-          logEntry.linkedGoal = liveEntry.goals[Number(row.goalIdx)];
-        }
-        return logEntry;
-      });
+      liveEntry.logs = validRows.map((row) => ({
+        activity: row.activity.trim(),
+        detail: row.detail.trim(),
+        tags: row.tags.slice(),
+      }));
       liveEntry.notice = notice;
 
       window.App.recomputeStreak();
+
+      // 新しく増えた活動・気づきの分だけ、当日記録時の半分のEXPを付与する。
+      const newRowsCount = Math.max(0, validRows.length - initialLogCount);
+      const noticeBonusEligible = notice !== "" && !initialHadNotice;
+      const character = window.App.getState().character;
+      let leveledUp = false;
+
+      if (newRowsCount > 0 || noticeBonusEligible) {
+        const streakBonus = Math.min(character.streak * 2, 20);
+        const fullExpGained = newRowsCount * 15 + (noticeBonusEligible ? 30 : 0) + streakBonus;
+        const pastDayExpGained = Math.floor(fullExpGained / 2);
+        if (pastDayExpGained > 0) {
+          liveEntry.expGained = (liveEntry.expGained || 0) + pastDayExpGained;
+          leveledUp = window.App.addExp(pastDayExpGained);
+        }
+      }
+
       window.App.persist();
       window.App.rerenderSidebar();
-
       close();
+
+      if (leveledUp) {
+        window.App.showLevelUp(character.level);
+      }
     }
 
     function renderEditable() {
       const workingEntry = entry || { date: dateStr, goals: [], logs: [], notice: "" };
       const goals = workingEntry.goals || [];
-      const goalOptions = goals
-        .map((g, i) => `<option value="${i}">${escapeHtml(g)}</option>`)
-        .join("");
 
       box.innerHTML = `
         <div class="modal-header">
@@ -173,7 +219,7 @@
           <button type="button" class="modal-close-btn" id="day-detail-close">✕</button>
         </div>
         <div class="day-detail-body">
-          <p class="day-detail-note">記録を忘れた日の活動を追記できます。連続日数にも反映されます。</p>
+          <p class="day-detail-note">記録を忘れた日の活動を追記できます。連続日数にも反映されます。獲得EXPは当日に記録した場合の半分になります。</p>
           ${
             goals.length
               ? `<div class="history-section"><div class="history-section-title">目標</div><ul>${goals
@@ -196,13 +242,13 @@
         </div>
       `;
 
-      renderDraftRows(goals, goalOptions);
+      renderDraftRows();
 
       document.getElementById("day-detail-close").addEventListener("click", close);
       document.getElementById("day-detail-cancel").addEventListener("click", close);
       document.getElementById("day-detail-add-row-btn").addEventListener("click", () => {
-        draftRows.push({ activity: "", detail: "", goalIdx: "" });
-        renderDraftRows(goals, goalOptions);
+        draftRows.push({ activity: "", detail: "", tags: [] });
+        renderDraftRows();
       });
       document.getElementById("day-detail-save").addEventListener("click", save);
     }

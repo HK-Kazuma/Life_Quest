@@ -48,9 +48,10 @@
                     <ul>${entry.logs
                       .map(
                         (log) =>
-                          `<li><strong>${escapeHtml(log.activity)}</strong>${
-                            log.detail ? ` - ${escapeHtml(log.detail)}` : ""
-                          }</li>`
+                          `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(
+                            log.tags,
+                            state.tags
+                          )}${log.detail ? ` - ${escapeHtml(log.detail)}` : ""}</li>`
                       )
                       .join("")}</ul>
                    </div>`

@@ -1,6 +1,6 @@
 // ②活動記録画面（冒険の書）：活動を複数追加し、気づきを添えて記録 → EXP加算・レベルアップ判定。
 (function () {
-  let draftRows = [{ activity: "", detail: "", goalIdx: "" }];
+  let draftRows = [{ activity: "", detail: "", tags: [] }];
   let syncedDate = null;
 
   function escapeHtml(str) {
@@ -22,9 +22,9 @@
         draftRows.length === 1 &&
         !draftRows[0].activity &&
         !draftRows[0].detail &&
-        draftRows[0].goalIdx === "";
+        draftRows[0].tags.length === 0;
       if (isPristine && entry.goals.length > 0 && entry.logs.length === 0) {
-        draftRows = entry.goals.map((g, i) => ({ activity: g, detail: "", goalIdx: String(i) }));
+        draftRows = entry.goals.map((g) => ({ activity: g, detail: "", tags: [] }));
       }
     }
 
@@ -69,7 +69,7 @@
     renderDraftRows(entry);
 
     document.getElementById("add-log-row-btn").addEventListener("click", () => {
-      draftRows.push({ activity: "", detail: "", goalIdx: "" });
+      draftRows.push({ activity: "", detail: "", tags: [] });
       renderDraftRows(entry);
     });
 
@@ -80,9 +80,8 @@
         const emptyRow = draftRows.find((r) => r.activity.trim() === "");
         if (emptyRow) {
           emptyRow.activity = goalText;
-          emptyRow.goalIdx = String(idx);
         } else {
-          draftRows.push({ activity: goalText, detail: "", goalIdx: String(idx) });
+          draftRows.push({ activity: goalText, detail: "", tags: [] });
         }
         renderDraftRows(entry);
       });
@@ -98,6 +97,7 @@
       box.innerHTML = "";
       return;
     }
+    const tags = window.App.getTags();
     box.innerHTML = `
       <div class="saved-logs-title">記録済みの活動</div>
       <ul class="saved-log-list">
@@ -106,7 +106,7 @@
             (log) => `
           <li>
             <strong>${escapeHtml(log.activity)}</strong>
-            ${log.linkedGoal ? `<span class="linked-goal-tag">→ ${escapeHtml(log.linkedGoal)}</span>` : ""}
+            ${window.TagsUtil.renderTagChips(log.tags, tags)}
             ${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}
           </li>`
           )
@@ -117,28 +117,35 @@
   function renderDraftRows(entry) {
     const box = document.getElementById("draft-logs");
     if (!box) return;
-    const goalOptions = entry.goals
-      .map((g, i) => `<option value="${i}">${escapeHtml(g)}</option>`)
-      .join("");
+    const tags = window.App.getTags();
+    const tagMap = window.TagsUtil.tagsById(tags);
 
     box.innerHTML = draftRows
-      .map(
-        (row, idx) => `
+      .map((row, idx) => {
+        const chipsHtml = row.tags
+          .map((tagId) => {
+            const t = tagMap[tagId];
+            if (!t) return "";
+            return `<span class="tag-chip" style="background:${t.color};color:${window.TagsUtil.contrastColor(
+              t.color
+            )}">${escapeHtml(t.name)}<button type="button" class="tag-chip-remove" data-row="${idx}" data-tag="${tagId}">✕</button></span>`;
+          })
+          .join("");
+        return `
         <div class="draft-log-row" data-idx="${idx}">
           <input type="text" class="draft-activity" placeholder="活動名（例: ランニング）" value="${escapeHtml(
             row.activity
           )}" />
-          ${
-            entry.goals.length > 0
-              ? `<select class="draft-goal-select"><option value="">目標と紐づけ（任意）</option>${goalOptions}</select>`
-              : ""
-          }
           <input type="text" class="draft-detail" placeholder="詳細：何を強化した？何を学んだ？" value="${escapeHtml(
             row.detail
           )}" />
           ${draftRows.length > 1 ? `<button class="remove-draft-btn" data-idx="${idx}">×</button>` : ""}
-        </div>`
-      )
+          <div class="draft-tags-row">
+            ${chipsHtml}
+            ${row.tags.length < 3 ? `<button type="button" class="tag-add-btn" data-row="${idx}">＋ タグ</button>` : ""}
+          </div>
+        </div>`;
+      })
       .join("");
 
     box.querySelectorAll(".draft-activity").forEach((input, i) => {
@@ -147,14 +154,34 @@
     box.querySelectorAll(".draft-detail").forEach((input, i) => {
       input.addEventListener("input", () => (draftRows[i].detail = input.value));
     });
-    box.querySelectorAll(".draft-goal-select").forEach((sel, i) => {
-      if (draftRows[i].goalIdx) sel.value = draftRows[i].goalIdx;
-      sel.addEventListener("change", () => (draftRows[i].goalIdx = sel.value));
-    });
     box.querySelectorAll(".remove-draft-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = Number(btn.dataset.idx);
         draftRows.splice(idx, 1);
+        renderDraftRows(entry);
+      });
+    });
+    box.querySelectorAll(".tag-add-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.row);
+        window.TagPickerModal.open({
+          attachedIds: draftRows[idx].tags,
+          onAttach: (tagId) => {
+            draftRows[idx].tags.push(tagId);
+            renderDraftRows(entry);
+          },
+          onTagDeleted: (tagId) => {
+            draftRows.forEach((r) => (r.tags = r.tags.filter((id) => id !== tagId)));
+            renderDraftRows(entry);
+          },
+        });
+      });
+    });
+    box.querySelectorAll(".tag-chip-remove").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.row);
+        const tagId = btn.dataset.tag;
+        draftRows[idx].tags = draftRows[idx].tags.filter((id) => id !== tagId);
         renderDraftRows(entry);
       });
     });
@@ -171,11 +198,7 @@
     }
 
     validRows.forEach((row) => {
-      const logEntry = { activity: row.activity.trim(), detail: row.detail.trim() };
-      if (row.goalIdx !== "" && entry.goals[Number(row.goalIdx)]) {
-        logEntry.linkedGoal = entry.goals[Number(row.goalIdx)];
-      }
-      entry.logs.push(logEntry);
+      entry.logs.push({ activity: row.activity.trim(), detail: row.detail.trim(), tags: row.tags.slice() });
     });
 
     if (notice) entry.notice = notice;
@@ -189,7 +212,7 @@
     const leveledUp = window.App.addExp(expGained);
     window.App.persist();
 
-    draftRows = [{ activity: "", detail: "", goalIdx: "" }];
+    draftRows = [{ activity: "", detail: "", tags: [] }];
 
     window.App.rerenderSidebar();
     render(document.getElementById("screen-content"), state);

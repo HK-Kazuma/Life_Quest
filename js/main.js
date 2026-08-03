@@ -97,6 +97,32 @@
     character.lastLogDate = lastLogDate;
   }
 
+  function getTags() {
+    return state.tags;
+  }
+
+  function createTag(name, color) {
+    const tag = {
+      id: "tag_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name,
+      color,
+    };
+    state.tags.push(tag);
+    window.App.persist();
+    return tag;
+  }
+
+  // タグ定義を削除し、過去の活動記録に残る参照も一緒に取り除く。
+  function deleteTag(tagId) {
+    state.tags = state.tags.filter((t) => t.id !== tagId);
+    state.history.forEach((entry) => {
+      entry.logs.forEach((log) => {
+        if (log.tags) log.tags = log.tags.filter((id) => id !== tagId);
+      });
+    });
+    window.App.persist();
+  }
+
   function updateStreakOnLog() {
     const today = todayStr();
     const character = state.character;
@@ -215,6 +241,9 @@
     getTodayEntry,
     getEntryForDate,
     getOrCreateEntryForDate,
+    getTags,
+    createTag,
+    deleteTag,
     updateStreakOnLog,
     recomputeStreak,
     addExp,
