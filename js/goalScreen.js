@@ -49,6 +49,7 @@
         entry.goals.splice(idx, 1);
         window.App.persist();
         renderGoalList(entry);
+        window.App.rerenderSidebar();
       });
     });
   }
@@ -61,6 +62,7 @@
     window.App.persist();
     input.value = "";
     renderGoalList(entry);
+    window.App.rerenderSidebar();
     input.focus();
   }
 

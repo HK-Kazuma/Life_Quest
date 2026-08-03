@@ -40,7 +40,7 @@
       4: "#1a1a1a",
     };
 
-    const cell = 12;
+    const cell = 15;
     const width = PIXELS[0].length * cell;
     const height = PIXELS.length * cell;
     let rects = "";

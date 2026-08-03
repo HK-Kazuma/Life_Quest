@@ -13,13 +13,26 @@
     <aside class="sidebar" id="sidebar"></aside>
 
     <main class="main-area">
-      <nav class="tabs">
-        <button class="tab-button" data-screen="goal">① 目標設定</button>
-        <button class="tab-button" data-screen="log">② 活動記録</button>
-        <button class="tab-button" data-screen="history">③ 履歴</button>
-      </nav>
-      <section id="screen-content" class="screen-content"></section>
+      <div class="book-closed" id="book-closed">
+        <img src="assets/book-cover.png" alt="冒険の書（クリックして開く）" class="book-cover-img" />
+        <div class="book-open-hint">クリックして開く</div>
+      </div>
+
+      <div class="book-open hidden" id="book-open">
+        <button id="close-book-btn" class="close-book-btn">✕ 書を閉じる</button>
+        <nav class="tabs">
+          <button class="tab-button" data-screen="goal">① 目標設定</button>
+          <button class="tab-button" data-screen="log">② 活動記録</button>
+          <button class="tab-button" data-screen="history">③ 履歴</button>
+        </nav>
+        <section id="screen-content" class="screen-content"></section>
+      </div>
     </main>
+
+    <aside class="right-column">
+      <div class="widget-box streak-widget-box" id="streak-widget"></div>
+      <div class="widget-box calendar-widget-box" id="calendar-widget"></div>
+    </aside>
   </div>
 
   <div id="levelup-overlay" class="levelup-overlay hidden">
@@ -37,6 +50,7 @@
   <script src="js/goalScreen.js"></script>
   <script src="js/logScreen.js"></script>
   <script src="js/historyScreen.js"></script>
+  <script src="js/widgets.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

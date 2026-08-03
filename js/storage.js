@@ -15,6 +15,7 @@
         currentExp: 0,
         totalExp: 0,
         streak: 0,
+        longestStreak: 0,
         lastLogDate: null,
       },
       profile: {

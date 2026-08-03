@@ -55,6 +55,7 @@
       }
     }
     character.lastLogDate = today;
+    character.longestStreak = Math.max(character.longestStreak || 0, character.streak);
   }
 
   function addExp(amount) {
@@ -80,6 +81,39 @@
 
   function rerenderSidebar() {
     window.CharacterPanel.render(state);
+    window.Widgets.render(state);
+  }
+
+  function openBook(animate) {
+    const closed = document.getElementById("book-closed");
+    const open = document.getElementById("book-open");
+    const rightColumn = document.querySelector(".right-column");
+    localStorage.setItem("adventureBookOpen", "1");
+
+    if (animate === false) {
+      closed.classList.add("hidden");
+      open.classList.remove("hidden");
+      rightColumn.classList.add("hidden");
+      return;
+    }
+
+    closed.classList.add("opening");
+    setTimeout(() => {
+      closed.classList.add("hidden");
+      closed.classList.remove("opening");
+      rightColumn.classList.add("hidden");
+
+      open.classList.remove("hidden");
+      open.classList.add("revealing");
+      setTimeout(() => open.classList.remove("revealing"), 400);
+    }, 450);
+  }
+
+  function closeBook() {
+    document.getElementById("book-open").classList.add("hidden");
+    document.getElementById("book-closed").classList.remove("hidden");
+    document.querySelector(".right-column").classList.remove("hidden");
+    localStorage.setItem("adventureBookOpen", "0");
   }
 
   function switchScreen(name) {
@@ -104,6 +138,13 @@
     document.querySelectorAll(".tab-button").forEach((btn) => {
       btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
     });
+
+    document.getElementById("book-closed").addEventListener("click", () => openBook(true));
+    document.getElementById("close-book-btn").addEventListener("click", closeBook);
+
+    if (localStorage.getItem("adventureBookOpen") === "1") {
+      openBook(false);
+    }
   }
 
   window.App = {
