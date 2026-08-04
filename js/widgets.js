@@ -100,29 +100,45 @@
   }
 
   // データのバックアップ（仮）：個人利用の間、JSONの書き出し・読み込みで保存データを持ち運べるようにする。
+  let backupPanelOpen = false;
+
   function renderBackupWidget() {
     const box = document.getElementById("backup-widget");
     if (!box) return;
 
     box.innerHTML = `
       <div class="backup-widget-title">データのバックアップ（仮）</div>
-      <p class="backup-widget-desc">今はこの端末のブラウザ内だけに保存されています。JSONで書き出し・読み込みができます。</p>
-      <div class="backup-widget-actions">
-        <button type="button" class="secondary-btn" id="backup-download-btn">↓ ダウンロード</button>
-        <button type="button" class="secondary-btn" id="backup-upload-btn">↑ アップロード</button>
-      </div>
-      <input type="file" id="backup-upload-input" accept="application/json" style="display:none" />
+      <p class="backup-widget-desc">今はこの端末のブラウザ内だけに保存されています。</p>
+      <button type="button" class="secondary-btn backup-toggle-btn" id="backup-toggle-btn">${
+        backupPanelOpen ? "閉じる ▲" : "書き出し・読み込み ▼"
+      }</button>
+      ${
+        backupPanelOpen
+          ? `<div class="backup-widget-actions">
+              <button type="button" class="secondary-btn" id="backup-download-btn">↓ ダウンロード</button>
+              <button type="button" class="secondary-btn" id="backup-upload-btn">↑ アップロード</button>
+             </div>
+             <input type="file" id="backup-upload-input" accept="application/json" style="display:none" />`
+          : ""
+      }
     `;
 
-    document.getElementById("backup-download-btn").addEventListener("click", downloadBackup);
-
-    const uploadInput = document.getElementById("backup-upload-input");
-    document.getElementById("backup-upload-btn").addEventListener("click", () => uploadInput.click());
-    uploadInput.addEventListener("change", () => {
-      const file = uploadInput.files[0];
-      uploadInput.value = "";
-      if (file) uploadBackup(file);
+    document.getElementById("backup-toggle-btn").addEventListener("click", () => {
+      backupPanelOpen = !backupPanelOpen;
+      renderBackupWidget();
     });
+
+    if (backupPanelOpen) {
+      document.getElementById("backup-download-btn").addEventListener("click", downloadBackup);
+
+      const uploadInput = document.getElementById("backup-upload-input");
+      document.getElementById("backup-upload-btn").addEventListener("click", () => uploadInput.click());
+      uploadInput.addEventListener("change", () => {
+        const file = uploadInput.files[0];
+        uploadInput.value = "";
+        if (file) uploadBackup(file);
+      });
+    }
   }
 
   function downloadBackup() {

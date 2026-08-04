@@ -422,6 +422,10 @@ button, input, textarea, select {
   line-height: 1.5;
 }
 
+.backup-toggle-btn {
+  margin-bottom: 0;
+}
+
 .backup-widget-actions {
   display: flex;
   gap: 8px;
