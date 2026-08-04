@@ -194,10 +194,21 @@
   }
 
   function closeBook() {
-    document.getElementById("book-open").classList.add("hidden");
-    document.getElementById("book-closed").classList.remove("hidden");
-    document.querySelector(".right-column").classList.remove("hidden");
+    const closed = document.getElementById("book-closed");
+    const open = document.getElementById("book-open");
+    const rightColumn = document.querySelector(".right-column");
     localStorage.setItem("adventureBookOpen", "0");
+
+    open.classList.add("concealing");
+    setTimeout(() => {
+      open.classList.add("hidden");
+      open.classList.remove("concealing");
+      rightColumn.classList.remove("hidden");
+
+      closed.classList.remove("hidden");
+      closed.classList.add("closing");
+      setTimeout(() => closed.classList.remove("closing"), 450);
+    }, 400);
   }
 
   function switchScreen(name) {

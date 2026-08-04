@@ -139,6 +139,36 @@ button, input, textarea, select {
   transition: opacity 0.15s ease;
 }
 
+/* 開くモーションの逆再生：表紙が起き上がって閉じる */
+@keyframes cover-close-swing {
+  0% {
+    transform: perspective(1400px) rotateY(-100deg);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes hint-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+.book-closed.closing .book-cover-img {
+  transform-origin: left center;
+  animation: cover-close-swing 0.45s ease-out forwards;
+}
+
+.book-closed.closing .book-open-hint {
+  animation: hint-fade-in 0.2s ease 0.25s both;
+}
+
 /* ---------- 冒険の書（開） ---------- */
 .book-open {
   display: flex;
@@ -181,6 +211,23 @@ button, input, textarea, select {
 .book-open.revealing {
   transform-origin: center;
   animation: pages-reveal 0.4s ease-out forwards;
+}
+
+/* 開くモーションの逆再生：ページが縮んで閉じる */
+@keyframes pages-conceal {
+  0% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0.82);
+  }
+}
+
+.book-open.concealing {
+  transform-origin: center;
+  animation: pages-conceal 0.4s ease-in forwards;
 }
 
 .close-book-btn {
