@@ -136,6 +136,8 @@
     box.querySelectorAll(".remove-draft-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = Number(btn.dataset.idx);
+        // ここで目標側(entry.goals)は変更しない。目標と実際の活動記録の差分を
+        // あとから把握できるよう、活動記録側だけを消す。
         draftRows.splice(idx, 1);
         renderDraftRows(entry);
       });
@@ -164,6 +166,18 @@
         renderDraftRows(entry);
       });
     });
+  }
+
+  // ①で目標が削除されたとき、自動反映しただけの下書き行を追随して消す。
+  function removeGoalFromDrafts(goalText) {
+    syncedGoals.delete(goalText);
+    const idx = draftRows.findIndex((r) => r.activity === goalText);
+    if (idx === -1) return;
+    draftRows.splice(idx, 1);
+    if (draftRows.length === 0) draftRows.push({ activity: "", detail: "", tags: [] });
+    if (document.getElementById("draft-logs")) {
+      renderDraftRows(window.App.getTodayEntry(true));
+    }
   }
 
   function saveLog(entry, state) {
@@ -201,5 +215,5 @@
     }
   }
 
-  window.LogScreen = { render };
+  window.LogScreen = { render, removeGoalFromDrafts };
 })();

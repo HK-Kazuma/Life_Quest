@@ -46,10 +46,11 @@
     list.querySelectorAll(".goal-remove-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = Number(btn.dataset.idx);
-        entry.goals.splice(idx, 1);
+        const [removedGoal] = entry.goals.splice(idx, 1);
         window.App.persist();
         renderGoalList(entry);
         window.App.rerenderSidebar();
+        if (window.LogScreen) window.LogScreen.removeGoalFromDrafts(removedGoal);
       });
     });
   }

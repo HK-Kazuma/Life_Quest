@@ -99,9 +99,70 @@
     });
   }
 
+  // データのバックアップ（仮）：個人利用の間、JSONの書き出し・読み込みで保存データを持ち運べるようにする。
+  function renderBackupWidget() {
+    const box = document.getElementById("backup-widget");
+    if (!box) return;
+
+    box.innerHTML = `
+      <div class="backup-widget-title">データのバックアップ（仮）</div>
+      <p class="backup-widget-desc">今はこの端末のブラウザ内だけに保存されています。JSONで書き出し・読み込みができます。</p>
+      <div class="backup-widget-actions">
+        <button type="button" class="secondary-btn" id="backup-download-btn">↓ ダウンロード</button>
+        <button type="button" class="secondary-btn" id="backup-upload-btn">↑ アップロード</button>
+      </div>
+      <input type="file" id="backup-upload-input" accept="application/json" style="display:none" />
+    `;
+
+    document.getElementById("backup-download-btn").addEventListener("click", downloadBackup);
+
+    const uploadInput = document.getElementById("backup-upload-input");
+    document.getElementById("backup-upload-btn").addEventListener("click", () => uploadInput.click());
+    uploadInput.addEventListener("change", () => {
+      const file = uploadInput.files[0];
+      uploadInput.value = "";
+      if (file) uploadBackup(file);
+    });
+  }
+
+  function downloadBackup() {
+    const json = JSON.stringify(window.App.getState(), null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `adventure-log-backup-${window.App.todayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function uploadBackup(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(reader.result);
+      } catch (e) {
+        alert("JSONファイルの読み込みに失敗しました。ファイルが壊れている可能性があります。");
+        return;
+      }
+      if (!parsed || !parsed.character || !parsed.history) {
+        alert("このアプリのバックアップファイルではないようです。");
+        return;
+      }
+      if (!confirm("現在のデータはすべて上書きされます。よろしいですか？")) return;
+      window.Storage.saveState(parsed);
+      location.reload();
+    };
+    reader.readAsText(file);
+  }
+
   function render(state) {
     renderStreakWidget(state);
     renderCalendarWidget(state);
+    renderBackupWidget();
   }
 
   window.Widgets = { render, dayTier };

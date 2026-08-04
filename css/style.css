@@ -355,6 +355,36 @@ button, input, textarea, select {
   box-shadow: 0 0 4px rgba(124, 172, 255, 0.6);
 }
 
+/* ---------- データバックアップウィジェット ---------- */
+.backup-widget-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.backup-widget-title {
+  font-size: 0.95rem;
+  color: var(--dq-accent);
+  opacity: 0.9;
+}
+
+.backup-widget-desc {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  line-height: 1.5;
+}
+
+.backup-widget-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.backup-widget-actions .secondary-btn {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 /* ---------- タブ ---------- */
 .tabs {
   display: flex;
