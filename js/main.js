@@ -237,6 +237,7 @@
 
     document.getElementById("book-closed").addEventListener("click", () => openBook(true));
     document.getElementById("close-book-btn").addEventListener("click", closeBook);
+    window.Widgets.initBackupButton();
 
     if (localStorage.getItem("adventureBookOpen") === "1") {
       openBook(false);

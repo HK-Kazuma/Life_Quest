@@ -402,38 +402,23 @@ button, input, textarea, select {
   box-shadow: 0 0 4px rgba(124, 172, 255, 0.6);
 }
 
-/* ---------- データバックアップウィジェット ---------- */
-.backup-widget-box {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.backup-widget-title {
-  font-size: 0.95rem;
-  color: var(--dq-accent);
-  opacity: 0.9;
-}
-
-.backup-widget-desc {
+/* ---------- データバックアップ（画面固定の小さなボタン→ポップアップ） ---------- */
+.backup-fab-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  background: rgba(20, 20, 60, 0.85);
+  border: 2px solid var(--dq-border-inner);
+  color: var(--dq-text);
+  border-radius: 4px;
+  padding: 6px 12px;
   font-size: 0.78rem;
-  opacity: 0.75;
-  line-height: 1.5;
+  cursor: pointer;
 }
 
-.backup-toggle-btn {
-  margin-bottom: 0;
-}
-
-.backup-widget-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.backup-widget-actions .secondary-btn {
-  flex: 1;
-  margin-bottom: 0;
+.backup-fab-btn:hover {
+  background: rgba(20, 20, 60, 1);
 }
 
 /* ---------- タブ ---------- */

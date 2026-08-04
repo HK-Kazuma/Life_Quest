@@ -100,35 +100,33 @@
   }
 
   // データのバックアップ（仮）：個人利用の間、JSONの書き出し・読み込みで保存データを持ち運べるようにする。
-  let backupPanelOpen = false;
+  // 右側ウィジェットのスケール・配置に影響しないよう、画面上の小さなボタン→ポップアップで完結させる。
+  function initBackupButton() {
+    const trigger = document.getElementById("backup-fab-btn");
+    const overlay = document.getElementById("backup-overlay");
+    const box = document.getElementById("backup-box");
+    if (!trigger || !overlay || !box) return;
 
-  function renderBackupWidget() {
-    const box = document.getElementById("backup-widget");
-    if (!box) return;
+    function close() {
+      overlay.classList.add("hidden");
+      overlay.onclick = null;
+    }
 
-    box.innerHTML = `
-      <div class="backup-widget-title">データのバックアップ（仮）</div>
-      <p class="backup-widget-desc">今はこの端末のブラウザ内だけに保存されています。</p>
-      <button type="button" class="secondary-btn backup-toggle-btn" id="backup-toggle-btn">${
-        backupPanelOpen ? "閉じる ▲" : "書き出し・読み込み ▼"
-      }</button>
-      ${
-        backupPanelOpen
-          ? `<div class="backup-widget-actions">
-              <button type="button" class="secondary-btn" id="backup-download-btn">↓ ダウンロード</button>
-              <button type="button" class="secondary-btn" id="backup-upload-btn">↑ アップロード</button>
-             </div>
-             <input type="file" id="backup-upload-input" accept="application/json" style="display:none" />`
-          : ""
-      }
-    `;
+    function open() {
+      box.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">データのバックアップ（仮）</h3>
+          <button type="button" class="modal-close-btn" id="backup-modal-close">✕</button>
+        </div>
+        <p>今はこの端末のブラウザ内だけに保存されています。JSONで書き出し・読み込みができます。</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="backup-download-btn">↓ ダウンロード</button>
+          <button type="button" class="secondary-btn" id="backup-upload-btn">↑ アップロード</button>
+        </div>
+        <input type="file" id="backup-upload-input" accept="application/json" style="display:none" />
+      `;
 
-    document.getElementById("backup-toggle-btn").addEventListener("click", () => {
-      backupPanelOpen = !backupPanelOpen;
-      renderBackupWidget();
-    });
-
-    if (backupPanelOpen) {
+      document.getElementById("backup-modal-close").addEventListener("click", close);
       document.getElementById("backup-download-btn").addEventListener("click", downloadBackup);
 
       const uploadInput = document.getElementById("backup-upload-input");
@@ -138,7 +136,14 @@
         uploadInput.value = "";
         if (file) uploadBackup(file);
       });
+
+      overlay.classList.remove("hidden");
+      overlay.onclick = (e) => {
+        if (e.target === overlay) close();
+      };
     }
+
+    trigger.addEventListener("click", open);
   }
 
   function downloadBackup() {
@@ -178,8 +183,7 @@
   function render(state) {
     renderStreakWidget(state);
     renderCalendarWidget(state);
-    renderBackupWidget();
   }
 
-  window.Widgets = { render, dayTier };
+  window.Widgets = { render, dayTier, initBackupButton };
 })();
