@@ -2,6 +2,7 @@
 (function () {
   let draftRows = [{ activity: "", detail: "", tags: [] }];
   let syncedDate = null;
+  let syncedGoals = new Set();
 
   function escapeHtml(str) {
     return String(str).replace(
@@ -14,19 +15,27 @@
   function render(container, state) {
     const entry = window.App.getTodayEntry(true);
 
-    // 今日はじめて②画面を開いたときは、①で立てた目標をそのまま下書き行に反映し、
-    // 同じ内容を再入力しなくて済むようにする。
+    // 日付が変わったら下書きをリセットする。
     if (syncedDate !== entry.date) {
       syncedDate = entry.date;
-      const isPristine =
-        draftRows.length === 1 &&
-        !draftRows[0].activity &&
-        !draftRows[0].detail &&
-        draftRows[0].tags.length === 0;
-      if (isPristine && entry.goals.length > 0 && entry.logs.length === 0) {
-        draftRows = entry.goals.map((g) => ({ activity: g, detail: "", tags: [] }));
-      }
+      draftRows = [{ activity: "", detail: "", tags: [] }];
+      syncedGoals = new Set();
     }
+
+    // ①で立てた目標は、その都度自動的に活動名として下書き行に反映する。
+    // 2件以上あれば、その分だけ活動行も自動で追加される。
+    entry.goals.forEach((goal) => {
+      if (syncedGoals.has(goal)) return;
+      syncedGoals.add(goal);
+      const emptyRow = draftRows.find(
+        (r) => !r.activity && !r.detail && r.tags.length === 0
+      );
+      if (emptyRow) {
+        emptyRow.activity = goal;
+      } else {
+        draftRows.push({ activity: goal, detail: "", tags: [] });
+      }
+    });
 
     container.innerHTML = `
       <div class="screen-panel">
@@ -34,22 +43,6 @@
         <p class="screen-desc">今日やったこと・活動を記録しよう。</p>
 
         <div class="saved-logs" id="saved-logs"></div>
-
-        ${
-          entry.goals.length > 0
-            ? `<div class="goal-chips-section">
-                <div class="goal-chips-label">今日の目標から追加</div>
-                <div class="goal-chips" id="goal-chips">
-                  ${entry.goals
-                    .map(
-                      (g, i) =>
-                        `<button type="button" class="goal-chip" data-idx="${i}">${escapeHtml(g)}</button>`
-                    )
-                    .join("")}
-                </div>
-               </div>`
-            : ""
-        }
 
         <div class="draft-logs" id="draft-logs"></div>
         <button id="add-log-row-btn" class="secondary-btn">＋ 活動を追加</button>
@@ -71,20 +64,6 @@
     document.getElementById("add-log-row-btn").addEventListener("click", () => {
       draftRows.push({ activity: "", detail: "", tags: [] });
       renderDraftRows(entry);
-    });
-
-    document.querySelectorAll(".goal-chip").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const idx = Number(btn.dataset.idx);
-        const goalText = entry.goals[idx];
-        const emptyRow = draftRows.find((r) => r.activity.trim() === "");
-        if (emptyRow) {
-          emptyRow.activity = goalText;
-        } else {
-          draftRows.push({ activity: goalText, detail: "", tags: [] });
-        }
-        renderDraftRows(entry);
-      });
     });
 
     document.getElementById("save-log-btn").addEventListener("click", () => saveLog(entry, state));

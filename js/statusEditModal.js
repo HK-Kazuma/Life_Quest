@@ -17,6 +17,85 @@
     // 保存を押すまでは実データを書き換えない下書き。
     let draftJob = c.job;
 
+    // 未保存の変更があるかを判定するための編集前スナップショット。
+    const original = {
+      job: c.job,
+      name: c.name,
+      gender: c.gender,
+      sport: c.sport,
+      specialty: c.specialty,
+      age: String(p.age),
+      height: String(p.height),
+      weight: String(p.weight),
+      booksPerYear: String(p.booksPerYear),
+      avgSleepHours: String(p.avgSleepHours),
+      bodyFatPercent: String(p.bodyFatPercent),
+      toeic: String(p.toeic),
+      nationalCerts: String(p.nationalCerts),
+      municipalCerts: String(p.municipalCerts),
+    };
+
+    function isDirty() {
+      return (
+        draftJob !== original.job ||
+        document.getElementById("edit-name").value !== original.name ||
+        document.getElementById("edit-gender").value !== original.gender ||
+        document.getElementById("edit-sport").value !== original.sport ||
+        document.getElementById("edit-specialty").value !== original.specialty ||
+        document.getElementById("edit-age").value !== original.age ||
+        document.getElementById("edit-height").value !== original.height ||
+        document.getElementById("edit-weight").value !== original.weight ||
+        document.getElementById("edit-books").value !== original.booksPerYear ||
+        document.getElementById("edit-sleep").value !== original.avgSleepHours ||
+        document.getElementById("edit-bodyfat").value !== original.bodyFatPercent ||
+        document.getElementById("edit-toeic").value !== original.toeic ||
+        document.getElementById("edit-national").value !== original.nationalCerts ||
+        document.getElementById("edit-municipal").value !== original.municipalCerts
+      );
+    }
+
+    function requestClose() {
+      if (isDirty()) {
+        openDiscardConfirm();
+        return;
+      }
+      close();
+    }
+
+    function openDiscardConfirm() {
+      const confirmOverlay = document.getElementById("status-edit-confirm-overlay");
+      const confirmBox = document.getElementById("status-edit-confirm-box");
+
+      confirmBox.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">保存されていない変更があります</h3>
+          <button type="button" class="modal-close-btn" id="status-edit-confirm-close">✕</button>
+        </div>
+        <p>保存されていない変更内容は失われます。よろしいですか？</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="status-edit-confirm-cancel">キャンセル</button>
+          <button type="button" class="danger-btn" id="status-edit-confirm-ok">破棄する</button>
+        </div>
+      `;
+
+      function closeConfirm() {
+        confirmOverlay.classList.add("hidden");
+        confirmOverlay.onclick = null;
+      }
+
+      document.getElementById("status-edit-confirm-close").addEventListener("click", closeConfirm);
+      document.getElementById("status-edit-confirm-cancel").addEventListener("click", closeConfirm);
+      document.getElementById("status-edit-confirm-ok").addEventListener("click", () => {
+        closeConfirm();
+        close();
+      });
+
+      confirmOverlay.classList.remove("hidden");
+      confirmOverlay.onclick = (e) => {
+        if (e.target === confirmOverlay) closeConfirm();
+      };
+    }
+
     function render() {
       box.innerHTML = `
         <div class="modal-header">
@@ -51,8 +130,8 @@
         </div>
       `;
 
-      document.getElementById("status-edit-close").addEventListener("click", close);
-      document.getElementById("status-edit-cancel").addEventListener("click", close);
+      document.getElementById("status-edit-close").addEventListener("click", requestClose);
+      document.getElementById("status-edit-cancel").addEventListener("click", requestClose);
       document.getElementById("status-edit-save").addEventListener("click", save);
       document.getElementById("job-field-btn").addEventListener("click", () => {
         window.JobModal.open(c.level, (jobName) => {
@@ -92,7 +171,7 @@
     render();
     overlay.classList.remove("hidden");
     overlay.onclick = (e) => {
-      if (e.target === overlay) close();
+      if (e.target === overlay) requestClose();
     };
   }
 

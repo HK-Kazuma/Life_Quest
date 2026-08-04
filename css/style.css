@@ -795,37 +795,6 @@ button:hover {
   box-shadow: 0 0 0 2px var(--dq-accent);
 }
 
-.goal-chips-section {
-  margin-bottom: 12px;
-}
-
-.goal-chips-label {
-  font-size: 0.8rem;
-  opacity: 0.75;
-  margin-bottom: 6px;
-}
-
-.goal-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.goal-chip {
-  background: transparent;
-  border: 2px dashed var(--dq-border-inner);
-  color: var(--dq-accent);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.goal-chip:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-style: solid;
-}
-
 .draft-log-row {
   display: flex;
   gap: 6px;
