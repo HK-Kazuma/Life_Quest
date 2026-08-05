@@ -752,7 +752,79 @@ button, input, textarea, select {
 
 /* ---------- カレンダーポップアップ ---------- */
 .modal-box.calendar-popup-box {
-  max-width: 560px;
+  max-width: 640px;
+}
+
+#calendar-quest-history-btn {
+  margin-bottom: 12px;
+}
+
+/* ---------- クエスト履歴（週ごと） ---------- */
+.quest-history-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.quest-history-week-title {
+  color: var(--dq-accent);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--dq-border-inner);
+}
+
+.quest-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quest-history-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px dashed var(--dq-border-inner);
+}
+
+.quest-history-text {
+  flex: 1 1 auto;
+  min-width: 100px;
+}
+
+.quest-history-date {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  flex: 0 0 auto;
+}
+
+.quest-history-status {
+  font-size: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.quest-history-status.cleared {
+  color: var(--dq-hp);
+}
+
+.quest-history-status.not-cleared {
+  opacity: 0.6;
+}
+
+.quest-history-accept-btn {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+}
+
+.quest-history-accept-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 /* ---------- クエストボード ---------- */

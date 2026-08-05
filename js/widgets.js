@@ -2,11 +2,65 @@
 (function () {
   const CALENDAR_DAYS = 35; // 5週間分
 
+  function escapeHtml(str) {
+    return String(str).replace(
+      /[&<>"']/g,
+      (ch) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch])
+    );
+  }
+
   function toDateStr(d) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
+  }
+
+  // 月曜始まりの週の開始日を返す。
+  function weekStartOf(dateStr) {
+    const d = new Date(dateStr + "T00:00:00");
+    const day = d.getDay(); // 0=日 ... 6=土
+    const diffToMonday = day === 0 ? 6 : day - 1;
+    d.setDate(d.getDate() - diffToMonday);
+    return toDateStr(d);
+  }
+
+  function formatWeekLabel(weekStartStr) {
+    const start = new Date(weekStartStr + "T00:00:00");
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const fmt = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
+    return `${fmt(start)} 〜 ${fmt(end)}`;
+  }
+
+  // 過去に受注したメイン/サブクエストを、受注日ごとに1件として並べる（新しい順）。
+  function buildQuestOccurrences(state) {
+    const occurrences = [];
+    state.history.forEach((entry) => {
+      if (!entry.goals || !entry.goalTypes) return;
+      entry.goals.forEach((text) => {
+        const type = entry.goalTypes[text];
+        if (type !== "main" && type !== "sub") return;
+        const cleared = entry.logs.some((log) => log.activity === text);
+        occurrences.push({ date: entry.date, text, type, cleared });
+      });
+    });
+    occurrences.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    return occurrences;
+  }
+
+  // 受注日が属する週（月曜始まり）ごとにグループ化する（新しい週が先頭）。
+  function groupOccurrencesByWeek(occurrences) {
+    const map = new Map();
+    occurrences.forEach((occ) => {
+      const weekStart = weekStartOf(occ.date);
+      if (!map.has(weekStart)) map.set(weekStart, []);
+      map.get(weekStart).push(occ);
+    });
+    return Array.from(map.entries())
+      .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+      .map(([weekStart, items]) => ({ weekStart, label: formatWeekLabel(weekStart), items }));
   }
 
   // その日の達成度を判定する。
@@ -19,7 +73,7 @@
     if (!entry.goals || entry.goals.length === 0) return "recorded";
 
     const achievedCount = entry.goals.filter((g) =>
-      entry.logs.some((log) => log.linkedGoal === g)
+      entry.logs.some((log) => log.activity === g)
     ).length;
 
     if (achievedCount === entry.goals.length) return "full";
@@ -112,22 +166,94 @@
     const box = document.getElementById("calendar-popup-box");
     if (!overlay || !box) return;
 
-    box.innerHTML = `
-      <div class="modal-header">
-        <h3 class="modal-title">活動記録カレンダー</h3>
-        <button type="button" class="modal-close-btn" id="calendar-popup-close">✕</button>
-      </div>
-      ${buildCalendarBodyHtml(state)}
-    `;
-
     function close() {
       overlay.classList.add("hidden");
       overlay.onclick = null;
     }
 
-    document.getElementById("calendar-popup-close").addEventListener("click", close);
-    bindCalendarCells(box, state);
+    function renderCalendarView() {
+      box.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">活動記録カレンダー</h3>
+          <button type="button" class="modal-close-btn" id="calendar-popup-close">✕</button>
+        </div>
+        <button type="button" class="secondary-btn" id="calendar-quest-history-btn">📜 クエスト履歴を見る</button>
+        ${buildCalendarBodyHtml(state)}
+      `;
 
+      document.getElementById("calendar-popup-close").addEventListener("click", close);
+      document.getElementById("calendar-quest-history-btn").addEventListener("click", renderQuestHistoryView);
+      bindCalendarCells(box, state);
+    }
+
+    // メイン/サブクエストの受注履歴を週ごとに表示し、その場で「今日」に再受注できるようにする。
+    function renderQuestHistoryView() {
+      const weeks = groupOccurrencesByWeek(buildQuestOccurrences(state));
+
+      box.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">クエスト履歴</h3>
+          <button type="button" class="modal-close-btn" id="calendar-popup-close">✕</button>
+        </div>
+        <button type="button" class="secondary-btn" id="quest-history-back">← カレンダーに戻る</button>
+        <div class="quest-history-body">
+          ${
+            weeks.length === 0
+              ? `<p class="empty-hint">まだメイン/サブクエストの受注記録がありません</p>`
+              : weeks
+                  .map(
+                    (w) => `
+                <div class="quest-history-week">
+                  <div class="quest-history-week-title">${escapeHtml(w.label)}</div>
+                  <ul class="quest-history-list">
+                    ${w.items
+                      .map(
+                        (occ) => `
+                      <li class="quest-history-item">
+                        <span class="quest-type-badge type-${occ.type}">${escapeHtml(
+                          window.QuestBoard.typeShortLabel(occ.type)
+                        )}</span>
+                        <span class="quest-history-text">${escapeHtml(occ.text)}</span>
+                        <span class="quest-history-date">${occ.date}</span>
+                        <span class="quest-history-status ${
+                          occ.cleared ? "cleared" : "not-cleared"
+                        }">${occ.cleared ? "✔ クリア" : "未クリア"}</span>
+                        <button type="button" class="secondary-btn quest-history-accept-btn" data-text="${escapeHtml(
+                          occ.text
+                        )}" data-type="${occ.type}">受注する</button>
+                      </li>
+                    `
+                      )
+                      .join("")}
+                  </ul>
+                </div>
+              `
+                  )
+                  .join("")
+          }
+        </div>
+      `;
+
+      document.getElementById("calendar-popup-close").addEventListener("click", close);
+      document.getElementById("quest-history-back").addEventListener("click", renderCalendarView);
+
+      box.querySelectorAll(".quest-history-accept-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const text = btn.dataset.text;
+          const type = btn.dataset.type;
+          const todayEntry = window.App.getTodayEntry(true);
+          todayEntry.goalTypes = todayEntry.goalTypes || {};
+          todayEntry.goals.push(text);
+          todayEntry.goalTypes[text] = type;
+          window.App.persist();
+          window.App.rerenderSidebar();
+          btn.textContent = "受注しました";
+          btn.disabled = true;
+        });
+      });
+    }
+
+    renderCalendarView();
     overlay.classList.remove("hidden");
     overlay.onclick = (e) => {
       if (e.target === overlay) close();
