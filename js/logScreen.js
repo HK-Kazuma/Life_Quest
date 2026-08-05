@@ -13,6 +13,13 @@
   }
 
   function render(container, state) {
+    const todayStr = window.App.todayStr();
+    // 宿屋で「今日はもう寝る」を選んだ後は、記録はカレンダー（過去日編集）から行う。
+    if (state.character.lastSleepDate === todayStr) {
+      renderSleepGate(container, state, todayStr);
+      return;
+    }
+
     const entry = window.App.getTodayEntry(true);
 
     // 日付が変わったら、その日にすでに保存済みの活動を下書きとして読み込み直す。
@@ -84,6 +91,33 @@
     });
 
     document.getElementById("save-log-btn").addEventListener("click", () => saveLog(entry, state));
+  }
+
+  function renderSleepGate(container, state, todayStr) {
+    const entry = window.App.getEntryForDate(todayStr);
+    container.innerHTML = `
+      <div class="screen-panel">
+        <h2 class="screen-title">① 冒険の書（活動記録）</h2>
+        <p class="screen-desc">宿屋で今日はもう眠りにつきました。今日の記録を追加・修正する場合はカレンダーから編集してください。</p>
+        <button type="button" class="secondary-btn" id="log-open-calendar-btn">カレンダーを開く</button>
+        ${
+          entry && entry.logs.length
+            ? `<div class="history-section"><div class="history-section-title">今日すでに記録した活動</div><ul>${entry.logs
+                .map(
+                  (log) =>
+                    `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(
+                      log.tags,
+                      window.App.getTags()
+                    )}${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}</li>`
+                )
+                .join("")}</ul></div>`
+            : ""
+        }
+      </div>
+    `;
+    document.getElementById("log-open-calendar-btn").addEventListener("click", () => {
+      window.Widgets.openCalendarPopup(state);
+    });
   }
 
   function renderDraftRows(entry) {

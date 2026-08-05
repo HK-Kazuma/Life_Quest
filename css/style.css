@@ -1956,6 +1956,144 @@ button:hover {
   gap: 8px;
 }
 
+/* ---------- 宿屋 ---------- */
+.modal-box.inn-box {
+  max-width: 640px;
+}
+
+.inn-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inn-section {
+  padding-top: 4px;
+}
+
+.inn-section:not(:first-child) {
+  border-top: 1px dashed var(--dq-border-inner);
+  padding-top: 16px;
+}
+
+.inn-section-title {
+  color: var(--dq-accent);
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.inn-hint {
+  opacity: 0.85;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.inn-log-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.inn-log-list li {
+  padding: 6px 2px;
+  border-bottom: 1px dashed var(--dq-border-inner);
+}
+
+.inn-notice-line {
+  opacity: 0.85;
+  margin: 4px 0;
+}
+
+.inn-exp-line {
+  color: var(--dq-accent);
+  font-weight: bold;
+  margin: 4px 0 0;
+}
+
+.inn-quest-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.inn-quest-col-label {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.inn-sleep-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.inn-sleep-result {
+  margin-top: 10px;
+  color: var(--dq-accent);
+  font-weight: bold;
+  min-height: 1.2em;
+}
+
+.inn-sleep-message {
+  opacity: 0.85;
+}
+
+/* ---------- 宿屋（翌朝の「おはよう」画面） ---------- */
+.modal-box.inn-morning-box {
+  max-width: 460px;
+  text-align: center;
+}
+
+.inn-morning-greeting {
+  font-size: 1.4rem;
+  color: var(--dq-accent);
+  margin-bottom: 8px;
+}
+
+.inn-morning-line {
+  margin: 0 0 12px;
+}
+
+.inn-morning-divider {
+  border-top: 1px dashed var(--dq-border-inner);
+  margin: 14px 0;
+}
+
+.inn-morning-quest-title {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 6px;
+}
+
+.inn-morning-quest-item {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: var(--dq-accent);
+}
+
+.inn-morning-quest-empty {
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
+
+.inn-morning-sub-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.inn-morning-sub-list li {
+  padding: 2px 0;
+}
+
+.inn-morning-close-btn {
+  margin-top: 18px;
+  width: 100%;
+}
+
 /* ---------- レスポンシブ ---------- */
 @media (max-width: 720px) {
   .app-layout {
@@ -1977,6 +2115,10 @@ button:hover {
   }
 
   .titles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inn-quest-cols {
     grid-template-columns: 1fr;
   }
 }

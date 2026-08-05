@@ -15,6 +15,7 @@
     { id: "map", label: "マップ", placeholder: true },
     { id: "achievements", label: "実績", placeholder: true },
     { id: "calendar", label: "カレンダー" },
+    { id: "inn", label: "宿屋" },
   ];
 
   function render(state) {
@@ -98,6 +99,8 @@
       openStatusPopup(state);
     } else if (commandId === "calendar") {
       window.Widgets.openCalendarPopup(state);
+    } else if (commandId === "inn") {
+      window.InnModal.open(state);
     } else {
       alert("この機能は準備中です。");
     }

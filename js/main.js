@@ -2,8 +2,13 @@
 (function () {
   let state = null;
 
+  // 論理上の「今日」。深夜〜AM4:00までは前日の続きとして扱う
+  // （記録し忘れではなく、日付をまたいで前日分を記録するケースを想定した宿屋の仕様）。
   function todayStr() {
     const d = new Date();
+    if (d.getHours() < 4) {
+      d.setDate(d.getDate() - 1);
+    }
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
@@ -244,6 +249,8 @@
     if (localStorage.getItem("adventureBookOpen") === "1") {
       openBook(false);
     }
+
+    if (window.InnModal) window.InnModal.maybeShowMorning(state);
   }
 
   window.App = {
@@ -251,6 +258,7 @@
     persist,
     todayStr,
     daysBetween,
+    shiftDateStr,
     neededForLevel,
     getTodayEntry,
     getEntryForDate,

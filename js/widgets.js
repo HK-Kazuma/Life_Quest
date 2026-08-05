@@ -106,7 +106,8 @@
     const currentStreak = state.character.streak || 0;
     const longestStreak = state.character.longestStreak || 0;
 
-    const todayStr = toDateStr(new Date());
+    // 「今日」の判定はAM4:00までを前日扱いする論理日付(window.App.todayStr)に合わせる。
+    const todayStr = window.App.todayStr();
     const cells = [];
     const today = new Date();
     for (let i = CALENDAR_DAYS - 1; i >= 0; i--) {
