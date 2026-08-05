@@ -44,6 +44,16 @@
         const parsed = JSON.parse(raw);
         if (parsed && parsed.character && parsed.history) {
           if (!parsed.tags) parsed.tags = [];
+          // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
+          // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
+          let backfilled = false;
+          parsed.history.forEach((entry) => {
+            if (entry.expAwarded === undefined) {
+              entry.expAwarded = (entry.logs && entry.logs.length > 0) || !!entry.notice;
+              backfilled = true;
+            }
+          });
+          if (backfilled) saveState(parsed);
           return parsed;
         }
       } catch (e) {

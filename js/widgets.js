@@ -41,10 +41,8 @@
     `;
   }
 
-  function renderCalendarWidget(state) {
-    const box = document.getElementById("calendar-widget");
-    if (!box) return;
-
+  // カレンダー本体（統計＋グリッド）のHTMLを組み立てる。右側ウィジェットとポップアップの両方から使う。
+  function buildCalendarBodyHtml(state) {
     const historyByDate = {};
     state.history.forEach((entry) => {
       historyByDate[entry.date] = entry;
@@ -65,7 +63,7 @@
       cells.push({ dateStr, tier, isToday: dateStr === todayStr });
     }
 
-    box.innerHTML = `
+    return `
       <div class="calendar-widget-stats">
         <div class="calendar-stat">
           <div class="calendar-stat-value">${achievementDays}</div>
@@ -91,12 +89,49 @@
           .join("")}
       </div>
     `;
+  }
 
-    box.querySelectorAll(".calendar-cell:not(.is-today)").forEach((cell) => {
+  function bindCalendarCells(container, state) {
+    container.querySelectorAll(".calendar-cell:not(.is-today)").forEach((cell) => {
       cell.addEventListener("click", () => {
         window.DayDetailModal.open(cell.dataset.date, state);
       });
     });
+  }
+
+  function renderCalendarWidget(state) {
+    const box = document.getElementById("calendar-widget");
+    if (!box) return;
+    box.innerHTML = buildCalendarBodyHtml(state);
+    bindCalendarCells(box, state);
+  }
+
+  // コマンドの「カレンダー」から開く、大きく見やすいカレンダーのポップアップ表示。
+  function openCalendarPopup(state) {
+    const overlay = document.getElementById("calendar-popup-overlay");
+    const box = document.getElementById("calendar-popup-box");
+    if (!overlay || !box) return;
+
+    box.innerHTML = `
+      <div class="modal-header">
+        <h3 class="modal-title">活動記録カレンダー</h3>
+        <button type="button" class="modal-close-btn" id="calendar-popup-close">✕</button>
+      </div>
+      ${buildCalendarBodyHtml(state)}
+    `;
+
+    function close() {
+      overlay.classList.add("hidden");
+      overlay.onclick = null;
+    }
+
+    document.getElementById("calendar-popup-close").addEventListener("click", close);
+    bindCalendarCells(box, state);
+
+    overlay.classList.remove("hidden");
+    overlay.onclick = (e) => {
+      if (e.target === overlay) close();
+    };
   }
 
   // データのバックアップ（仮）：個人利用の間、JSONの書き出し・読み込みで保存データを持ち運べるようにする。
@@ -185,5 +220,5 @@
     renderCalendarWidget(state);
   }
 
-  window.Widgets = { render, dayTier, initBackupButton };
+  window.Widgets = { render, dayTier, initBackupButton, openCalendarPopup };
 })();

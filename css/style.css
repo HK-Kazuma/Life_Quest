@@ -474,6 +474,64 @@ button, input, textarea, select {
   font-size: 0.95rem;
 }
 
+/* ---------- DQ風コマンドウィンドウ（サイドバー） ---------- */
+.dq-command-box {
+  padding-top: 2px;
+}
+
+.dq-command-title {
+  color: var(--dq-accent);
+  font-size: 1.05rem;
+  text-align: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--dq-border-inner);
+}
+
+.dq-command-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.dq-command-item {
+  position: relative;
+  background: transparent;
+  border: 2px solid var(--dq-border-inner);
+  color: var(--dq-text);
+  border-radius: 4px;
+  padding: 10px 10px 10px 22px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.dq-command-item::before {
+  content: "▶";
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dq-accent);
+  opacity: 0;
+  font-size: 0.8em;
+}
+
+.dq-command-item:hover,
+.dq-command-item:focus-visible {
+  border-color: var(--dq-accent);
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.dq-command-item:hover::before,
+.dq-command-item:focus-visible::before {
+  opacity: 1;
+}
+
+.dq-command-item.is-placeholder {
+  opacity: 0.55;
+}
+
 /* ---------- キャラクターパネル ---------- */
 .sprite-frame {
   display: flex;
@@ -565,25 +623,6 @@ button, input, textarea, select {
   opacity: 0.75;
 }
 
-.detail-toggle-btn {
-  width: 100%;
-  background: transparent;
-  color: var(--dq-text);
-  border: 2px solid var(--dq-border-inner);
-  border-radius: 4px;
-  padding: 8px;
-  cursor: pointer;
-  margin-bottom: 8px;
-}
-
-.detail-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.detail-panel.hidden {
-  display: none;
-}
-
 .todo-section {
   margin-top: 12px;
 }
@@ -607,6 +646,133 @@ button, input, textarea, select {
   padding: 5px 2px;
   font-size: 0.9rem;
   border-bottom: 1px dashed var(--dq-border-inner);
+}
+
+/* ---------- ステータスポップアップ（横広げレイアウト） ---------- */
+.modal-box.character-status-box {
+  max-width: 880px;
+}
+
+.character-status-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.character-status-main {
+  flex: 0 0 180px;
+}
+
+.character-status-main .sprite-img {
+  width: 92px;
+}
+
+.character-status-main .char-name {
+  font-size: 1.1rem;
+}
+
+.character-status-main .exp-bar {
+  height: 18px;
+  margin-bottom: 8px;
+}
+
+.character-status-main .edit-status-btn {
+  font-size: 0.8rem;
+  padding: 6px 4px;
+  margin-bottom: 0;
+}
+
+.character-status-columns {
+  flex: 1 1 360px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
+.character-status-todo {
+  margin-top: 18px;
+}
+
+/* ---------- カレンダーポップアップ ---------- */
+.modal-box.calendar-popup-box {
+  max-width: 560px;
+}
+
+/* ---------- クエストボード ---------- */
+.modal-box.quest-board-box {
+  max-width: 520px;
+  background: linear-gradient(160deg, #b8875a, #8f6239);
+  border: 10px solid #5c3a1e;
+  box-shadow: inset 0 0 0 3px #3f2712, 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.quest-board-header .modal-title,
+.quest-board-header .modal-close-btn {
+  color: #3f2712;
+}
+
+.quest-board-header {
+  border-bottom: 2px solid rgba(63, 39, 18, 0.35);
+}
+
+.quest-board-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quest-board-item {
+  background: #f1e2bd;
+  border: 3px solid #5c3a1e;
+  border-radius: 3px;
+  padding: 18px;
+  font-size: 1.15rem;
+  color: #3f2712;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.quest-board-item:hover {
+  background: #fff3d6;
+  transform: translateY(-2px);
+}
+
+.quest-board-back-btn {
+  margin-bottom: 12px;
+}
+
+.quest-board-box .goal-list li {
+  border-bottom: 1px dashed rgba(63, 39, 18, 0.4);
+  color: #2a1a0c;
+}
+
+.quest-board-box .empty-hint {
+  color: #2a1a0c;
+}
+
+.quest-type-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border: 1px solid currentColor;
+}
+
+.quest-type-badge.type-main {
+  color: #ffd700;
+}
+
+.quest-type-badge.type-sub {
+  color: #7ec8ff;
+}
+
+.quest-type-badge.type-daily {
+  color: #7effa0;
 }
 
 /* ---------- フォーム系 共通 ---------- */
@@ -672,15 +838,13 @@ button:hover {
   min-height: 40vh;
 }
 
-.goal-list,
-.saved-log-list {
+.goal-list {
   list-style: none;
   margin: 0 0 12px;
   padding: 0;
 }
 
-.goal-list li,
-.saved-log-list li {
+.goal-list li {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -708,16 +872,6 @@ button:hover {
 }
 
 /* ---------- 活動記録画面 ---------- */
-.saved-logs {
-  margin-bottom: 12px;
-}
-
-.saved-logs-title {
-  color: var(--dq-accent);
-  font-size: 0.85rem;
-  margin-bottom: 6px;
-}
-
 .log-detail {
   opacity: 0.8;
   font-size: 0.85rem;

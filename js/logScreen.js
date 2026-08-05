@@ -15,11 +15,19 @@
   function render(container, state) {
     const entry = window.App.getTodayEntry(true);
 
-    // 日付が変わったら下書きをリセットする。
+    // 日付が変わったら、その日にすでに保存済みの活動を下書きとして読み込み直す。
+    // 同日中はこの下書きがそのまま編集対象になるので、記録済みの内容もここから修正できる。
     if (syncedDate !== entry.date) {
       syncedDate = entry.date;
-      draftRows = [{ activity: "", detail: "", tags: [] }];
-      syncedGoals = new Set();
+      draftRows =
+        entry.logs.length > 0
+          ? entry.logs.map((log) => ({
+              activity: log.activity,
+              detail: log.detail || "",
+              tags: log.tags ? log.tags.slice() : [],
+            }))
+          : [{ activity: "", detail: "", tags: [] }];
+      syncedGoals = new Set(entry.goals.filter((g) => draftRows.some((r) => r.activity === g)));
     }
 
     // ①で立てた目標は、その都度自動的に活動名として下書き行に反映する。
@@ -40,9 +48,11 @@
     container.innerHTML = `
       <div class="screen-panel">
         <h2 class="screen-title">② 冒険の書（活動記録）</h2>
-        <p class="screen-desc">今日やったこと・活動を記録しよう。</p>
-
-        <div class="saved-logs" id="saved-logs"></div>
+        <p class="screen-desc">${
+          entry.expAwarded
+            ? "今日の記録は修正できます（2回目以降の保存にXPはつきません）。"
+            : "今日やったこと・活動を記録しよう。"
+        }</p>
 
         <div class="draft-logs" id="draft-logs"></div>
         <button id="add-log-row-btn" class="secondary-btn">＋ 活動を追加</button>
@@ -58,7 +68,6 @@
       </div>
     `;
 
-    renderSavedLogs(entry);
     renderDraftRows(entry);
 
     document.getElementById("add-log-row-btn").addEventListener("click", () => {
@@ -67,30 +76,6 @@
     });
 
     document.getElementById("save-log-btn").addEventListener("click", () => saveLog(entry, state));
-  }
-
-  function renderSavedLogs(entry) {
-    const box = document.getElementById("saved-logs");
-    if (!box) return;
-    if (entry.logs.length === 0) {
-      box.innerHTML = "";
-      return;
-    }
-    const tags = window.App.getTags();
-    box.innerHTML = `
-      <div class="saved-logs-title">記録済みの活動</div>
-      <ul class="saved-log-list">
-        ${entry.logs
-          .map(
-            (log) => `
-          <li>
-            <strong>${escapeHtml(log.activity)}</strong>
-            ${window.TagsUtil.renderTagChips(log.tags, tags)}
-            ${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}
-          </li>`
-          )
-          .join("")}
-      </ul>`;
   }
 
   function renderDraftRows(entry) {
@@ -190,28 +175,35 @@
       return;
     }
 
-    validRows.forEach((row) => {
-      entry.logs.push({ activity: row.activity.trim(), detail: row.detail.trim(), tags: row.tags.slice() });
-    });
-
-    if (notice) entry.notice = notice;
+    // その日の記録は下書きの内容でまるごと置き換える＝再修正できる。
+    entry.logs = validRows.map((row) => ({
+      activity: row.activity.trim(),
+      detail: row.detail.trim(),
+      tags: row.tags.slice(),
+    }));
+    entry.notice = notice;
 
     window.App.updateStreakOnLog();
-    const character = state.character;
-    const streakBonus = Math.min(character.streak * 2, 20);
-    const expGained = validRows.length * 15 + (notice ? 30 : 0) + streakBonus;
 
-    entry.expGained = (entry.expGained || 0) + expGained;
-    const leveledUp = window.App.addExp(expGained);
+    // XPが付くのはその日最初の「記録する」だけ。2回目以降の修正はXP無し。
+    let leveledUp = false;
+    if (!entry.expAwarded) {
+      const character = state.character;
+      const streakBonus = Math.min(character.streak * 2, 20);
+      const expGained = validRows.length * 15 + (notice ? 30 : 0) + streakBonus;
+
+      entry.expGained = (entry.expGained || 0) + expGained;
+      leveledUp = window.App.addExp(expGained);
+      entry.expAwarded = true;
+    }
+
     window.App.persist();
-
-    draftRows = [{ activity: "", detail: "", tags: [] }];
 
     window.App.rerenderSidebar();
     render(document.getElementById("screen-content"), state);
 
     if (leveledUp) {
-      window.App.showLevelUp(character.level);
+      window.App.showLevelUp(state.character.level);
     }
   }
 

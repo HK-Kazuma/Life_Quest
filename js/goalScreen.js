@@ -39,14 +39,21 @@
       list.innerHTML = `<li class="empty-hint">まだ目標がありません</li>`;
     }
     entry.goals.forEach((goal, idx) => {
+      const questType = entry.goalTypes && entry.goalTypes[goal];
+      const badge = questType
+        ? `<span class="quest-type-badge type-${questType}">${escapeHtml(
+            window.QuestBoard ? window.QuestBoard.typeShortLabel(questType) : questType
+          )}</span>`
+        : "";
       const li = document.createElement("li");
-      li.innerHTML = `<span>${escapeHtml(goal)}</span><button class="goal-remove-btn" data-idx="${idx}">×</button>`;
+      li.innerHTML = `<span>${badge}${escapeHtml(goal)}</span><button class="goal-remove-btn" data-idx="${idx}">×</button>`;
       list.appendChild(li);
     });
     list.querySelectorAll(".goal-remove-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = Number(btn.dataset.idx);
         const [removedGoal] = entry.goals.splice(idx, 1);
+        if (entry.goalTypes) delete entry.goalTypes[removedGoal];
         window.App.persist();
         renderGoalList(entry);
         window.App.rerenderSidebar();
