@@ -1466,6 +1466,295 @@ button:hover {
   max-width: 620px;
 }
 
+/* ---------- 世界樹（長期目標のルート管理） ---------- */
+.modal-box.worldtree-app-box {
+  max-width: 960px;
+}
+
+/* 進捗に応じて世界樹の画像を根本から少しずつ見せる共通パーツ。
+   --wt-progress(0-100) を上から間引くclip-pathで「下から育っていく」見た目にする。 */
+.wt-tree-icon {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1110 / 866;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--dq-bg);
+}
+
+.wt-tree-icon-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  clip-path: inset(calc(100% - var(--wt-progress, 6) * 1%) 0 0 0);
+  filter: saturate(calc(0.35 + var(--wt-progress, 6) * 0.0065))
+    brightness(calc(0.75 + var(--wt-progress, 6) * 0.0025));
+  transition: clip-path 0.5s ease, filter 0.5s ease;
+}
+
+.wt-goal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.wt-goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.wt-goal-card:hover {
+  border-color: var(--dq-accent);
+  background: rgba(255, 215, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.wt-goal-card-title {
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+.wt-goal-card-stage {
+  font-size: 0.78rem;
+  color: var(--dq-accent);
+  opacity: 0.9;
+}
+
+.wt-goal-progress-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.wt-goal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #7effa0);
+}
+
+.wt-goal-progress-text {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.wt-goal-card-add {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--dq-accent);
+  border-style: dashed;
+  min-height: 180px;
+}
+
+.wt-add-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+/* ---------- 目標作成フォーム ---------- */
+.wt-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wt-form-label {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--dq-accent);
+}
+
+.wt-milestone-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.wt-milestone-input-index {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--dq-border-inner);
+  font-size: 0.75rem;
+}
+
+.wt-create-submit-btn {
+  margin-top: 14px;
+}
+
+.wt-form-hint {
+  color: var(--dq-danger);
+  font-size: 0.82rem;
+  min-height: 1.2em;
+  margin: 4px 0 0;
+}
+
+/* ---------- ルート表示（根本〜頂点） ---------- */
+.wt-route-layout {
+  position: relative;
+  min-height: 420px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--dq-bg);
+}
+
+.wt-route-tree-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+}
+
+.wt-route-tree-bg .wt-tree-icon-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wt-route-path {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wt-route-path::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 32px;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--dq-border-inner) 0,
+    var(--dq-border-inner) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+.wt-route-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.wt-route-node-icon {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  background: var(--dq-box);
+  border: 2px solid var(--dq-border-inner);
+}
+
+.wt-route-node-label {
+  font-size: 0.92rem;
+}
+
+.wt-route-node--done .wt-route-node-icon {
+  border-color: var(--dq-hp);
+  color: var(--dq-hp);
+}
+
+.wt-route-node--done .wt-route-node-label {
+  opacity: 0.75;
+}
+
+.wt-route-node--current {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.wt-route-node--current .wt-route-node-icon {
+  border-color: var(--dq-accent);
+  color: var(--dq-accent);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.wt-route-node--locked {
+  opacity: 0.5;
+}
+
+.wt-route-node--clickable {
+  cursor: pointer;
+}
+
+.wt-route-node--clickable:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.wt-route-node--goal {
+  font-weight: bold;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--dq-border-inner);
+  margin-bottom: 8px;
+}
+
+.wt-route-node--goal .wt-route-node-icon {
+  width: 34px;
+  height: 34px;
+  font-size: 1.1rem;
+}
+
+.wt-route-node--goal.wt-route-node--done .wt-route-node-icon {
+  border-color: var(--dq-accent);
+  color: var(--dq-accent);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
+
+.wt-route-node--root {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--dq-border-inner);
+  opacity: 0.85;
+}
+
+.wt-route-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.wt-route-progress-text {
+  font-weight: bold;
+  color: var(--dq-accent);
+}
+
+.wt-route-footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* ---------- レスポンシブ ---------- */
 @media (max-width: 720px) {
   .app-layout {

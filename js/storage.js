@@ -37,6 +37,9 @@
       // 日をまたいでも残り続けるデイリークエスト: { id, text, lastClearedDate }
       // lastClearedDateが今日の日付と一致する間だけ「クリア済み」として扱う。
       dailyQuests: [],
+      // 世界樹：冒険の書の①目標とは別の、長期目標とその達成ルート。
+      // goal: { id, title, createdAt, milestones: [{id, title, done, completedAt}] }
+      worldTree: { goals: [] },
     };
   }
 
@@ -48,6 +51,7 @@
         if (parsed && parsed.character && parsed.history) {
           if (!parsed.tags) parsed.tags = [];
           if (!parsed.dailyQuests) parsed.dailyQuests = [];
+          if (!parsed.worldTree) parsed.worldTree = { goals: [] };
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;

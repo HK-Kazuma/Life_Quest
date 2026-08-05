@@ -38,18 +38,19 @@
       btn.addEventListener("click", () => runCommand(btn.dataset.command, state));
     });
 
-    renderWorldTree();
+    renderWorldTree(state);
   }
 
   // コマンド窓とは別枠（world-tree-slot）に世界樹を描画する。
   // コマンド側のスクロール領域と切り離すことで、ホバー拡大時に
   // コマンド側にスクロールバーが出たり他要素へ影響したりしないようにする。
-  function renderWorldTree() {
+  // クリックすると、長期目標のルートを管理する世界樹画面を開く。
+  function renderWorldTree(state) {
     const slot = document.getElementById("world-tree-slot");
     if (!slot) return;
 
     slot.innerHTML = `
-      <img src="assets/image_close.png" data-closed="assets/image_close.png" data-open="assets/image_open.png" alt="世界樹" class="world-tree-img" />
+      <img src="assets/image_close.png" data-closed="assets/image_close.png" data-open="assets/image_open.png" alt="世界樹（クリックして目標のルートを開く）" class="world-tree-img" />
     `;
 
     const worldTreeImg = slot.querySelector(".world-tree-img");
@@ -59,6 +60,9 @@
       });
       worldTreeImg.addEventListener("mouseleave", () => {
         worldTreeImg.src = worldTreeImg.dataset.closed;
+      });
+      worldTreeImg.addEventListener("click", () => {
+        if (window.WorldTreeApp) window.WorldTreeApp.open(state);
       });
     }
   }
@@ -130,6 +134,10 @@
           <input type="text" id="todo-input" placeholder="やりたいことを追加..." />
           <button id="todo-add-btn">追加</button>
         </div>
+      </div>
+      <div class="titles-section">
+        <div class="todo-title">称号</div>
+        ${renderTitlesGrid(state)}
       </div>
     `;
 
