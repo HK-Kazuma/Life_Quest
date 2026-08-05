@@ -251,11 +251,48 @@
       });
 
       document.getElementById("wt-delete-goal-btn").addEventListener("click", () => {
-        if (!confirm(`「${goal.title}」を削除します。よろしいですか？`)) return;
-        window.WorldTree.deleteGoal(state, goalId);
+        openDeleteConfirm(goal);
+      });
+    }
+
+    // 目標削除の注意書きはブラウザ標準のconfirm()ではなく、専用ポップアップで表示する。
+    function openDeleteConfirm(goal) {
+      const confirmOverlay = document.getElementById("wt-delete-confirm-overlay");
+      const confirmBox = document.getElementById("wt-delete-confirm-box");
+      if (!confirmOverlay || !confirmBox) return;
+
+      confirmBox.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">この目標を削除しますか？</h3>
+          <button type="button" class="modal-close-btn" id="wt-delete-confirm-close">✕</button>
+        </div>
+        <p>「${escapeHtml(goal.title)}」と、設定した小さな目標（${
+        goal.milestones.length
+      }件）・進捗がすべて削除されます。この操作は取り消せません。</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="wt-delete-confirm-cancel">キャンセル</button>
+          <button type="button" class="danger-btn" id="wt-delete-confirm-ok">削除する</button>
+        </div>
+      `;
+
+      function closeConfirm() {
+        confirmOverlay.classList.add("hidden");
+        confirmOverlay.onclick = null;
+      }
+
+      document.getElementById("wt-delete-confirm-close").addEventListener("click", closeConfirm);
+      document.getElementById("wt-delete-confirm-cancel").addEventListener("click", closeConfirm);
+      document.getElementById("wt-delete-confirm-ok").addEventListener("click", () => {
+        window.WorldTree.deleteGoal(state, goal.id);
         window.App.persist();
+        closeConfirm();
         renderList();
       });
+
+      confirmOverlay.classList.remove("hidden");
+      confirmOverlay.onclick = (e) => {
+        if (e.target === confirmOverlay) closeConfirm();
+      };
     }
 
     renderList();

@@ -37,6 +37,27 @@
           }))
         : [{ activity: "", detail: "", tags: [] }];
 
+    // クエストボードで受注したものの、記録し忘れて日付が変わってしまった目標は、
+    // ここでも編集可能な下書き行として反映する（活動記録の当日画面と同じ救済措置）。
+    if (entry && entry.goals && entry.goals.length) {
+      const autoTagByType = {
+        main: window.TagsUtil.SYSTEM_TAGS.main.id,
+        sub: window.TagsUtil.SYSTEM_TAGS.sub.id,
+      };
+      entry.goals.forEach((goal) => {
+        if (draftRows.some((r) => r.activity === goal)) return;
+        const goalType = entry.goalTypes && entry.goalTypes[goal];
+        const autoTagId = autoTagByType[goalType];
+        const emptyRow = draftRows.find((r) => !r.activity && !r.detail && r.tags.length === 0);
+        if (emptyRow) {
+          emptyRow.activity = goal;
+          if (autoTagId) emptyRow.tags = [autoTagId];
+        } else {
+          draftRows.push({ activity: goal, detail: "", tags: autoTagId ? [autoTagId] : [] });
+        }
+      });
+    }
+
     function close() {
       overlay.classList.add("hidden");
       overlay.onclick = null;
@@ -104,8 +125,8 @@
             .map((tagId) => {
               const t = tagMap[tagId];
               if (!t) return "";
-              return `<span class="tag-chip" style="background:${t.color};color:${window.TagsUtil.contrastColor(
-                t.color
+              return `<span class="${window.TagsUtil.tagChipClass(t)}" style="${window.TagsUtil.tagChipStyle(
+                t
               )}">${escapeHtml(t.name)}<button type="button" class="tag-chip-remove" data-row="${idx}" data-tag="${tagId}">✕</button></span>`;
             })
             .join("");

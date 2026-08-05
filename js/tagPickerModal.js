@@ -25,7 +25,9 @@
     }
 
     function render() {
-      const tags = window.App.getTags();
+      // メイン/サブのシステムタグはクエスト受注時に自動で付くものなので、
+      // 手動での付け外し・削除の対象からは外す。
+      const tags = window.App.getTags().filter((t) => !t.system);
       box.innerHTML = `
         <div class="modal-header">
           <h3 class="modal-title">タグを追加</h3>

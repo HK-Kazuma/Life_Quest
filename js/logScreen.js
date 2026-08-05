@@ -32,16 +32,24 @@
 
     // クエストボードで受注した目標(メイン/サブ)は、その都度自動的に活動名として下書き行に反映する。
     // 2件以上あれば、その分だけ活動行も自動で追加される。
+    // メイン/サブで受注したものには、対応するシステムタグ（メイン/サブ）を自動で付ける。
+    const autoTagByType = {
+      main: window.TagsUtil.SYSTEM_TAGS.main.id,
+      sub: window.TagsUtil.SYSTEM_TAGS.sub.id,
+    };
     entry.goals.forEach((goal) => {
       if (syncedGoals.has(goal)) return;
       syncedGoals.add(goal);
+      const goalType = entry.goalTypes && entry.goalTypes[goal];
+      const autoTagId = autoTagByType[goalType];
       const emptyRow = draftRows.find(
         (r) => !r.activity && !r.detail && r.tags.length === 0
       );
       if (emptyRow) {
         emptyRow.activity = goal;
+        if (autoTagId) emptyRow.tags = [autoTagId];
       } else {
-        draftRows.push({ activity: goal, detail: "", tags: [] });
+        draftRows.push({ activity: goal, detail: "", tags: autoTagId ? [autoTagId] : [] });
       }
     });
 
@@ -90,8 +98,8 @@
           .map((tagId) => {
             const t = tagMap[tagId];
             if (!t) return "";
-            return `<span class="tag-chip" style="background:${t.color};color:${window.TagsUtil.contrastColor(
-              t.color
+            return `<span class="${window.TagsUtil.tagChipClass(t)}" style="${window.TagsUtil.tagChipStyle(
+              t
             )}">${escapeHtml(t.name)}<button type="button" class="tag-chip-remove" data-row="${idx}" data-tag="${tagId}">✕</button></span>`;
           })
           .join("");

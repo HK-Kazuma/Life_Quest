@@ -226,6 +226,7 @@
 
   function init() {
     state = window.Storage.loadState();
+    if (window.TagsUtil.ensureSystemTags(state)) persist();
     rerenderSidebar();
 
     const validTabs = ["log", "dailyQuest", "history", "reset"];
