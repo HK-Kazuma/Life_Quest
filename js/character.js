@@ -37,6 +37,30 @@
     document.querySelectorAll(".dq-command-item").forEach((btn) => {
       btn.addEventListener("click", () => runCommand(btn.dataset.command, state));
     });
+
+    renderWorldTree();
+  }
+
+  // コマンド窓とは別枠（world-tree-slot）に世界樹を描画する。
+  // コマンド側のスクロール領域と切り離すことで、ホバー拡大時に
+  // コマンド側にスクロールバーが出たり他要素へ影響したりしないようにする。
+  function renderWorldTree() {
+    const slot = document.getElementById("world-tree-slot");
+    if (!slot) return;
+
+    slot.innerHTML = `
+      <img src="assets/image_close.png" data-closed="assets/image_close.png" data-open="assets/image_open.png" alt="世界樹" class="world-tree-img" />
+    `;
+
+    const worldTreeImg = slot.querySelector(".world-tree-img");
+    if (worldTreeImg) {
+      worldTreeImg.addEventListener("mouseenter", () => {
+        worldTreeImg.src = worldTreeImg.dataset.open;
+      });
+      worldTreeImg.addEventListener("mouseleave", () => {
+        worldTreeImg.src = worldTreeImg.dataset.closed;
+      });
+    }
   }
 
   function runCommand(commandId, state) {
