@@ -39,6 +39,7 @@
     });
 
     renderWorldTree(state);
+    renderChallengeQuestBadge(state);
   }
 
   // コマンド窓とは別枠（world-tree-slot）に世界樹を描画する。
@@ -65,6 +66,29 @@
         if (window.WorldTreeApp) window.WorldTreeApp.open(state);
       });
     }
+  }
+
+  // 世界樹の下に「チャレンジクエスト」であることを明示する表示を置く。
+  // 冒険の書に記録するメイン/サブ/デイリークエストとは別物であることが伝わるように、
+  // 世界樹＝チャレンジクエストの達成状況（クリア数／挑戦中の数）をここに出す。
+  function renderChallengeQuestBadge(state) {
+    const slot = document.getElementById("challenge-quest-slot");
+    if (!slot || !window.WorldTree) return;
+
+    const goals = window.WorldTree.getGoals(state);
+    const cleared = goals.filter((g) => window.WorldTree.progress(g).complete).length;
+    const active = goals.length - cleared;
+
+    slot.innerHTML = `
+      <button type="button" class="challenge-quest-badge" id="challenge-quest-badge">
+        <div class="challenge-quest-badge-title">チャレンジクエスト</div>
+        <div class="challenge-quest-badge-stats">達成 ${cleared} 回／挑戦中 ${active} 件</div>
+      </button>
+    `;
+
+    document.getElementById("challenge-quest-badge").addEventListener("click", () => {
+      if (window.WorldTreeApp) window.WorldTreeApp.open(state);
+    });
   }
 
   function runCommand(commandId, state) {
@@ -162,6 +186,42 @@
     overlay.onclick = (e) => {
       if (e.target === overlay) close();
     };
+  }
+
+  // 称号一覧：未取得は称号名を"????"で伏せ、イメージ(説明文)は常に表示する。
+  function renderTitlesGrid(state) {
+    if (!window.Titles) return "";
+    const categories = window.Titles.getTitlesByCategory(state);
+
+    return `
+      <div class="titles-grid">
+        ${categories
+          .map(
+            (cat) => `
+          <div class="titles-column">
+            <div class="titles-column-title">${escapeHtml(cat.label)}</div>
+            <div class="titles-column-current">現在：${cat.currentValue}</div>
+            <ul class="titles-list">
+              ${cat.titles
+                .map(
+                  (t) => `
+                <li class="title-row ${t.unlocked ? "unlocked" : "locked"}">
+                  <div class="title-row-top">
+                    <span class="title-req">${escapeHtml(cat.reqLabel(t.threshold))}</span>
+                    <span class="title-name">${t.unlocked ? escapeHtml(t.name) : "????"}</span>
+                  </div>
+                  <div class="title-flavor">${escapeHtml(t.flavor)}</div>
+                </li>
+              `
+                )
+                .join("")}
+            </ul>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    `;
   }
 
   function renderTodoList(state) {

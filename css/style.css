@@ -51,28 +51,8 @@ button, input, textarea, select {
 }
 
 .sidebar {
-  max-height: calc(100vh - 32px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--dq-border-inner) var(--dq-box);
-}
-
-.sidebar button,
-.sidebar input {
-  font-size: 1.05rem;
-}
-
-.sidebar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: var(--dq-box);
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: var(--dq-border-inner);
-  border-radius: 4px;
+  flex: 0 0 auto;
+  overflow: visible;
 }
 
 .main-area {
@@ -482,22 +462,22 @@ button, input, textarea, select {
   border: 4px solid var(--dq-border-outer);
   box-shadow: inset 0 0 0 2px var(--dq-border-inner);
   border-radius: 4px;
-  padding: 20px;
+  padding: 12px;
 }
 
 .dq-command-title {
   color: var(--dq-accent);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   text-align: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 5px;
   border-bottom: 2px solid var(--dq-border-inner);
 }
 
 .dq-command-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 6px;
 }
 
 .dq-command-item {
@@ -506,10 +486,10 @@ button, input, textarea, select {
   border: 2px solid var(--dq-border-inner);
   color: var(--dq-text);
   border-radius: 4px;
-  padding: 10px 10px 10px 22px;
+  padding: 6px 8px 6px 20px;
   text-align: left;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .dq-command-item::before {
@@ -558,6 +538,40 @@ button, input, textarea, select {
 
 .world-tree-img:hover {
   transform: scale(1.08);
+}
+
+/* ---------- チャレンジクエスト（世界樹＝長期目標であることの表示） ---------- */
+.challenge-quest-slot {
+  padding: 0 12px;
+}
+
+.challenge-quest-badge {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--dq-box);
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.challenge-quest-badge:hover {
+  border-color: var(--dq-accent);
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.challenge-quest-badge-title {
+  color: var(--dq-accent);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.challenge-quest-badge-stats {
+  font-size: 0.72rem;
+  opacity: 0.8;
 }
 
 /* ---------- キャラクターパネル ---------- */
@@ -678,7 +692,7 @@ button, input, textarea, select {
 
 /* ---------- ステータスポップアップ（横広げレイアウト） ---------- */
 .modal-box.character-status-box {
-  max-width: 880px;
+  max-width: 960px;
 }
 
 .character-status-layout {
@@ -1466,6 +1480,85 @@ button:hover {
   max-width: 620px;
 }
 
+/* ---------- 称号（実績の視覚化） ---------- */
+.titles-section {
+  margin-top: 16px;
+}
+
+.titles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.titles-column-title {
+  color: var(--dq-accent);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.titles-column-current {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.titles-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 1px solid var(--dq-border-inner);
+  border-radius: 4px;
+}
+
+.title-row.locked {
+  opacity: 0.5;
+}
+
+.title-row.unlocked {
+  border-color: var(--dq-accent);
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.title-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.title-req {
+  font-size: 0.68rem;
+  opacity: 0.7;
+  flex: 0 0 auto;
+}
+
+.title-name {
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-align: right;
+}
+
+.title-row.unlocked .title-name {
+  color: var(--dq-accent);
+}
+
+.title-flavor {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
 /* ---------- 世界樹（長期目標のルート管理） ---------- */
 .modal-box.worldtree-app-box {
   max-width: 960px;
@@ -1773,5 +1866,9 @@ button:hover {
 
   .right-column {
     flex-direction: row;
+  }
+
+  .titles-grid {
+    grid-template-columns: 1fr;
   }
 }
