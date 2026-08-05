@@ -1,4 +1,4 @@
-// ⑤デイリークエスト画面：毎日の習慣にしたい小さな行動を管理する。
+// ②デイリークエスト画面：毎日の習慣にしたい小さな行動を管理する。
 // クエストボードから受注したデイリークエストは日をまたいでも残り続け、
 // クリア状況(lastClearedDate)だけが日付が変わるとリセットされる。
 (function () {
@@ -18,7 +18,7 @@
 
     container.innerHTML = `
       <div class="screen-panel">
-        <h2 class="screen-title">⑤ デイリークエスト</h2>
+        <h2 class="screen-title">② デイリークエスト</h2>
         <p class="screen-desc">毎日の習慣にしたい小さな行動を管理しよう。クリアすると少しだけEXPがもらえる（取り消し不可）。クリア状況は日付が変わるとリセットされる。</p>
         <ul class="daily-quest-list" id="daily-quest-list"></ul>
       </div>

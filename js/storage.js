@@ -17,6 +17,8 @@
         streak: 0,
         longestStreak: 0,
         lastLogDate: null,
+        // 装備中の称号ID（js/titles.jsのTITLES[].id）。未装備はnull。
+        equippedTitle: null,
       },
       profile: {
         age: cfg.age ?? "-",
@@ -52,6 +54,7 @@
           if (!parsed.tags) parsed.tags = [];
           if (!parsed.dailyQuests) parsed.dailyQuests = [];
           if (!parsed.worldTree) parsed.worldTree = { goals: [] };
+          if (parsed.character.equippedTitle === undefined) parsed.character.equippedTitle = null;
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;

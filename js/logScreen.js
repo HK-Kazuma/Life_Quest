@@ -1,4 +1,4 @@
-// ②活動記録画面（冒険の書）：活動を複数追加し、気づきを添えて記録 → EXP加算・レベルアップ判定。
+// ①活動記録画面（冒険の書）：活動を複数追加し、気づきを添えて記録 → EXP加算・レベルアップ判定。
 (function () {
   let draftRows = [{ activity: "", detail: "", tags: [] }];
   let syncedDate = null;
@@ -30,7 +30,7 @@
       syncedGoals = new Set(entry.goals.filter((g) => draftRows.some((r) => r.activity === g)));
     }
 
-    // ①で立てた目標は、その都度自動的に活動名として下書き行に反映する。
+    // クエストボードで受注した目標(メイン/サブ)は、その都度自動的に活動名として下書き行に反映する。
     // 2件以上あれば、その分だけ活動行も自動で追加される。
     entry.goals.forEach((goal) => {
       if (syncedGoals.has(goal)) return;
@@ -47,7 +47,7 @@
 
     container.innerHTML = `
       <div class="screen-panel">
-        <h2 class="screen-title">② 冒険の書（活動記録）</h2>
+        <h2 class="screen-title">① 冒険の書（活動記録）</h2>
         <p class="screen-desc">${
           entry.expAwarded
             ? "今日の記録は修正できます（2回目以降の保存にXPはつきません）。"
@@ -153,7 +153,7 @@
     });
   }
 
-  // ①で目標が削除されたとき、自動反映しただけの下書き行を追随して消す。
+  // クエストボードで目標が削除されたとき、自動反映しただけの下書き行を追随して消す。
   function removeGoalFromDrafts(goalText) {
     syncedGoals.delete(goalText);
     const idx = draftRows.findIndex((r) => r.activity === goalText);

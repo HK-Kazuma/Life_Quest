@@ -11,38 +11,38 @@
   ];
 
   const TITLES = [
-    { category: "level", threshold: 1, name: "駆け出し冒険者", flavor: "旅の始まり" },
-    { category: "level", threshold: 5, name: "見習い挑戦者", flavor: "継続できるようになった" },
-    { category: "level", threshold: 10, name: "成長する探究者", flavor: "学ぶ習慣がついた" },
-    { category: "level", threshold: 20, name: "熟練の修行者", flavor: "努力が当たり前になる" },
-    { category: "level", threshold: 35, name: "知識の開拓者", flavor: "新しい分野へ挑戦" },
-    { category: "level", threshold: 50, name: "一流の実践者", flavor: "行動で成果を出せる" },
-    { category: "level", threshold: 70, name: "道を極めし者", flavor: "高い継続力" },
-    { category: "level", threshold: 100, name: "英雄", flavor: "大きな節目" },
-    { category: "level", threshold: 150, name: "伝説の探究者", flavor: "多くの経験を積む" },
-    { category: "level", threshold: 200, name: "神話の冒険者", flavor: "最終クラスの称号" },
+    { id: "level_1", category: "level", threshold: 1, name: "駆け出し冒険者", flavor: "旅の始まり" },
+    { id: "level_5", category: "level", threshold: 5, name: "見習い挑戦者", flavor: "継続できるようになった" },
+    { id: "level_10", category: "level", threshold: 10, name: "成長する探究者", flavor: "学ぶ習慣がついた" },
+    { id: "level_20", category: "level", threshold: 20, name: "熟練の修行者", flavor: "努力が当たり前になる" },
+    { id: "level_35", category: "level", threshold: 35, name: "知識の開拓者", flavor: "新しい分野へ挑戦" },
+    { id: "level_50", category: "level", threshold: 50, name: "一流の実践者", flavor: "行動で成果を出せる" },
+    { id: "level_70", category: "level", threshold: 70, name: "道を極めし者", flavor: "高い継続力" },
+    { id: "level_100", category: "level", threshold: 100, name: "英雄", flavor: "大きな節目" },
+    { id: "level_150", category: "level", threshold: 150, name: "伝説の探究者", flavor: "多くの経験を積む" },
+    { id: "level_200", category: "level", threshold: 200, name: "神話の冒険者", flavor: "最終クラスの称号" },
 
-    { category: "streak", threshold: 3, name: "火種", flavor: "習慣が生まれ始める" },
-    { category: "streak", threshold: 7, name: "習慣の芽", flavor: "1週間達成" },
-    { category: "streak", threshold: 14, name: "不屈の新人", flavor: "継続が安定" },
-    { category: "streak", threshold: 30, name: "継続の達人", flavor: "1か月継続" },
-    { category: "streak", threshold: 50, name: "意志の剣士", flavor: "意志が強い" },
-    { category: "streak", threshold: 100, name: "鋼の精神", flavor: "100日突破" },
-    { category: "streak", threshold: 180, name: "止まらぬ旅人", flavor: "半年間継続" },
-    { category: "streak", threshold: 365, name: "一年の覇者", flavor: "1年間毎日" },
-    { category: "streak", threshold: 730, name: "時を超える冒険者", flavor: "2年間継続" },
-    { category: "streak", threshold: 1000, name: "永遠の探究者", flavor: "継続の象徴" },
+    { id: "streak_3", category: "streak", threshold: 3, name: "火種", flavor: "習慣が生まれ始める" },
+    { id: "streak_7", category: "streak", threshold: 7, name: "習慣の芽", flavor: "1週間達成" },
+    { id: "streak_14", category: "streak", threshold: 14, name: "不屈の新人", flavor: "継続が安定" },
+    { id: "streak_30", category: "streak", threshold: 30, name: "継続の達人", flavor: "1か月継続" },
+    { id: "streak_50", category: "streak", threshold: 50, name: "意志の剣士", flavor: "意志が強い" },
+    { id: "streak_100", category: "streak", threshold: 100, name: "鋼の精神", flavor: "100日突破" },
+    { id: "streak_180", category: "streak", threshold: 180, name: "止まらぬ旅人", flavor: "半年間継続" },
+    { id: "streak_365", category: "streak", threshold: 365, name: "一年の覇者", flavor: "1年間毎日" },
+    { id: "streak_730", category: "streak", threshold: 730, name: "時を超える冒険者", flavor: "2年間継続" },
+    { id: "streak_1000", category: "streak", threshold: 1000, name: "永遠の探究者", flavor: "継続の象徴" },
 
-    { category: "quest", threshold: 1, name: "初陣突破", flavor: "最初の達成" },
-    { category: "quest", threshold: 3, name: "挑戦者", flavor: "成功体験が増える" },
-    { category: "quest", threshold: 5, name: "試練の踏破者", flavor: "継続して成果を出す" },
-    { category: "quest", threshold: 10, name: "クエストハンター", flavor: "達成が習慣化" },
-    { category: "quest", threshold: 20, name: "栄光の収集家", flavor: "多くの目標を達成" },
-    { category: "quest", threshold: 35, name: "偉業の探究者", flavor: "難しい目標にも挑む" },
-    { category: "quest", threshold: 50, name: "英知の冒険者", flavor: "知識と経験が豊富" },
-    { category: "quest", threshold: 75, name: "夢の実現者", flavor: "大きな夢を叶える" },
-    { category: "quest", threshold: 100, name: "伝説の達成者", flavor: "圧倒的な実績" },
-    { category: "quest", threshold: 150, name: "運命を切り拓く者", flavor: "最高峰の称号" },
+    { id: "quest_1", category: "quest", threshold: 1, name: "初陣突破", flavor: "最初の達成" },
+    { id: "quest_3", category: "quest", threshold: 3, name: "挑戦者", flavor: "成功体験が増える" },
+    { id: "quest_5", category: "quest", threshold: 5, name: "試練の踏破者", flavor: "継続して成果を出す" },
+    { id: "quest_10", category: "quest", threshold: 10, name: "クエストハンター", flavor: "達成が習慣化" },
+    { id: "quest_20", category: "quest", threshold: 20, name: "栄光の収集家", flavor: "多くの目標を達成" },
+    { id: "quest_35", category: "quest", threshold: 35, name: "偉業の探究者", flavor: "難しい目標にも挑む" },
+    { id: "quest_50", category: "quest", threshold: 50, name: "英知の冒険者", flavor: "知識と経験が豊富" },
+    { id: "quest_75", category: "quest", threshold: 75, name: "夢の実現者", flavor: "大きな夢を叶える" },
+    { id: "quest_100", category: "quest", threshold: 100, name: "伝説の達成者", flavor: "圧倒的な実績" },
+    { id: "quest_150", category: "quest", threshold: 150, name: "運命を切り拓く者", flavor: "最高峰の称号" },
   ];
 
   // チャレンジクエストクリア数 = 世界樹に設定した目標(チャレンジクエスト)が100%達成された数。
@@ -69,5 +69,42 @@
     });
   }
 
-  window.Titles = { CATEGORIES, TITLES, getQuestClearCount, getTitlesByCategory };
+  function isUnlocked(state, titleId) {
+    const title = TITLES.find((t) => t.id === titleId);
+    if (!title) return false;
+    return getProgressValue(state, title.category) >= title.threshold;
+  }
+
+  // 獲得済み（装備可能）の称号一覧。カテゴリ順・段階順のまま返す。
+  function getUnlockedTitles(state) {
+    return CATEGORIES.flatMap((cat) =>
+      TITLES.filter((t) => t.category === cat.key && getProgressValue(state, cat.key) >= t.threshold).map(
+        (t) => ({ ...t, categoryLabel: cat.label })
+      )
+    );
+  }
+
+  function getTitleById(titleId) {
+    return TITLES.find((t) => t.id === titleId) || null;
+  }
+
+  // 装備中の称号名。未装備・すでに条件を満たさなくなった場合はnull。
+  function getEquippedTitleName(state) {
+    const id = state.character.equippedTitle;
+    if (!id) return null;
+    if (!isUnlocked(state, id)) return null;
+    const title = getTitleById(id);
+    return title ? title.name : null;
+  }
+
+  window.Titles = {
+    CATEGORIES,
+    TITLES,
+    getQuestClearCount,
+    getTitlesByCategory,
+    isUnlocked,
+    getUnlockedTitles,
+    getTitleById,
+    getEquippedTitleName,
+  };
 })();

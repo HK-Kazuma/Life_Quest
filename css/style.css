@@ -665,6 +665,20 @@ button, input, textarea, select {
   opacity: 0.75;
 }
 
+.title-equip-select {
+  width: auto;
+  flex: 0 0 auto;
+  max-width: 160px;
+  padding: 3px 6px;
+  font-size: 0.85rem;
+  color: var(--dq-accent);
+}
+
+.title-equip-empty {
+  opacity: 0.6;
+  font-size: 0.85rem;
+}
+
 .todo-section {
   margin-top: 12px;
 }

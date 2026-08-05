@@ -134,6 +134,7 @@
         <div class="character-status-columns">
           <ul class="status-list">
             <li><span class="label">職業</span><span class="value">${escapeHtml(c.job)}</span></li>
+            <li><span class="label">称号</span><span class="value">${titleSelectHtml(state)}</span></li>
             <li><span class="label">性別</span><span class="value">${escapeHtml(c.gender)}</span></li>
             <li><span class="label">年齢</span><span class="value">${escapeHtml(String(p.age))}</span></li>
             <li><span class="label">スポーツ</span><span class="value">${escapeHtml(c.sport)}</span></li>
@@ -181,11 +182,39 @@
       close();
       window.StatusEditModal.open(state);
     });
+    const titleSelect = document.getElementById("equipped-title-select");
+    if (titleSelect) {
+      titleSelect.addEventListener("change", () => {
+        state.character.equippedTitle = titleSelect.value || null;
+        window.App.persist();
+      });
+    }
 
     overlay.classList.remove("hidden");
     overlay.onclick = (e) => {
       if (e.target === overlay) close();
     };
+  }
+
+  // 職業欄の下に置く称号の装備セレクト。獲得済み(unlocked)の称号だけを選択肢にする。
+  function titleSelectHtml(state) {
+    if (!window.Titles) return "-";
+    const unlocked = window.Titles.getUnlockedTitles(state);
+    const equipped = state.character.equippedTitle;
+    if (unlocked.length === 0) {
+      return `<span class="title-equip-empty">未獲得</span>`;
+    }
+    return `
+      <select id="equipped-title-select" class="title-equip-select">
+        <option value="">未設定</option>
+        ${unlocked
+          .map(
+            (t) =>
+              `<option value="${t.id}"${equipped === t.id ? " selected" : ""}>${escapeHtml(t.name)}</option>`
+          )
+          .join("")}
+      </select>
+    `;
   }
 
   // 称号一覧：未取得は称号名を"????"で伏せ、イメージ(説明文)は常に表示する。

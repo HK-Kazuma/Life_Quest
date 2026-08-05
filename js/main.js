@@ -217,8 +217,7 @@
     });
     const container = document.getElementById("screen-content");
     container.innerHTML = "";
-    if (name === "goal") window.GoalScreen.render(container, state);
-    else if (name === "log") window.LogScreen.render(container, state);
+    if (name === "log") window.LogScreen.render(container, state);
     else if (name === "history") window.HistoryScreen.render(container, state);
     else if (name === "reset") window.ResetScreen.render(container, state);
     else if (name === "dailyQuest") window.DailyQuestScreen.render(container, state);
@@ -229,8 +228,9 @@
     state = window.Storage.loadState();
     rerenderSidebar();
 
-    const savedTab = localStorage.getItem("adventureLogActiveTab") || "goal";
-    switchScreen(savedTab);
+    const validTabs = ["log", "dailyQuest", "history", "reset"];
+    const savedTab = localStorage.getItem("adventureLogActiveTab");
+    switchScreen(validTabs.includes(savedTab) ? savedTab : "log");
 
     document.querySelectorAll(".tab-button").forEach((btn) => {
       btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
