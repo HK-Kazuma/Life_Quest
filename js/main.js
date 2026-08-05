@@ -221,6 +221,7 @@
     else if (name === "log") window.LogScreen.render(container, state);
     else if (name === "history") window.HistoryScreen.render(container, state);
     else if (name === "reset") window.ResetScreen.render(container, state);
+    else if (name === "dailyQuest") window.DailyQuestScreen.render(container, state);
     localStorage.setItem("adventureLogActiveTab", name);
   }
 

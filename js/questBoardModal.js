@@ -1,5 +1,7 @@
 // クエストボード：「クエスト」コマンドから開く。メイン/サブ/デイリーの3種類から選び、
-// 自由入力したクエストを受注する。受注したクエストは①の目標(entry.goals)と同じデータに統合される。
+// 自由入力したクエストを受注する。
+// - メイン/サブ：①の目標(entry.goals)と同じデータに統合され、1日単位でリセットされる。
+// - デイリー：state.dailyQuests に永続保存され、冒険の書「デイリークエスト」タブで管理する。
 (function () {
   const QUEST_TYPES = [
     { id: "main", label: "メインクエスト", short: "メイン" },
@@ -50,11 +52,15 @@
 
       document.getElementById("quest-board-close").addEventListener("click", close);
       document.querySelectorAll(".quest-board-item").forEach((btn) => {
-        btn.addEventListener("click", () => renderTypeView(btn.dataset.type));
+        btn.addEventListener("click", () => {
+          if (btn.dataset.type === "daily") renderDailyView();
+          else renderGoalTypeView(btn.dataset.type);
+        });
       });
     }
 
-    function renderTypeView(typeId) {
+    // メイン/サブ：今日の目標(entry.goals)に統合するタイプ。
+    function renderGoalTypeView(typeId) {
       const entry = window.App.getTodayEntry(true);
       entry.goalTypes = entry.goalTypes || {};
       const label = typeLabel(typeId);
@@ -100,7 +106,7 @@
           window.App.persist();
           window.App.rerenderSidebar();
           if (window.LogScreen) window.LogScreen.removeGoalFromDrafts(removedGoal);
-          renderTypeView(typeId);
+          renderGoalTypeView(typeId);
         });
       });
 
@@ -112,7 +118,77 @@
         entry.goalTypes[text] = typeId;
         window.App.persist();
         window.App.rerenderSidebar();
-        renderTypeView(typeId);
+        renderGoalTypeView(typeId);
+      }
+
+      document.getElementById("quest-board-accept-btn").addEventListener("click", accept);
+      document.getElementById("quest-board-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") accept();
+      });
+      document.getElementById("quest-board-input").focus();
+    }
+
+    // デイリー：日をまたいで残り続ける永続リスト(state.dailyQuests)。
+    // クリア状況の管理は冒険の書「デイリークエスト」タブで行う。
+    function renderDailyView() {
+      const label = typeLabel("daily");
+      const quests = state.dailyQuests;
+
+      box.innerHTML = `
+        <div class="modal-header quest-board-header">
+          <h3 class="modal-title">${escapeHtml(label)}</h3>
+          <button type="button" class="modal-close-btn" id="quest-board-close">✕</button>
+        </div>
+        <button type="button" class="secondary-btn quest-board-back-btn" id="quest-board-back">← ボードに戻る</button>
+        <p class="quest-board-daily-note">受注したデイリークエストは、冒険の書の「デイリークエスト」タブで毎日クリアできます。</p>
+        <ul class="goal-list" id="quest-board-list">
+          ${
+            quests.length === 0
+              ? `<li class="empty-hint">まだ受注していません</li>`
+              : quests
+                  .map(
+                    (q) => `
+                <li data-id="${q.id}">
+                  <span>${escapeHtml(q.text)}</span>
+                  <button class="goal-remove-btn" data-id="${q.id}">×</button>
+                </li>`
+                  )
+                  .join("")
+          }
+        </ul>
+        <div class="goal-add-row">
+          <input type="text" id="quest-board-input" placeholder="${escapeHtml(label)}の内容を入力..." />
+          <button type="button" id="quest-board-accept-btn" class="primary-btn">受注する</button>
+        </div>
+      `;
+
+      document.getElementById("quest-board-close").addEventListener("click", close);
+      document.getElementById("quest-board-back").addEventListener("click", renderBoard);
+
+      document.querySelectorAll("#quest-board-list .goal-remove-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          state.dailyQuests = state.dailyQuests.filter((q) => q.id !== id);
+          window.App.persist();
+          renderDailyView();
+        });
+      });
+
+      function accept() {
+        const input = document.getElementById("quest-board-input");
+        const text = input.value.trim();
+        if (!text) return;
+        if (state.dailyQuests.some((q) => q.text === text)) {
+          alert("そのデイリークエストはすでに受注済みです。");
+          return;
+        }
+        state.dailyQuests.push({
+          id: "daily_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          text,
+          lastClearedDate: null,
+        });
+        window.App.persist();
+        renderDailyView();
       }
 
       document.getElementById("quest-board-accept-btn").addEventListener("click", accept);

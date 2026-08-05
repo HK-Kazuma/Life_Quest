@@ -34,6 +34,9 @@
       history: [],
       // tag: { id, name, color }
       tags: [],
+      // 日をまたいでも残り続けるデイリークエスト: { id, text, lastClearedDate }
+      // lastClearedDateが今日の日付と一致する間だけ「クリア済み」として扱う。
+      dailyQuests: [],
     };
   }
 
@@ -44,6 +47,7 @@
         const parsed = JSON.parse(raw);
         if (parsed && parsed.character && parsed.history) {
           if (!parsed.tags) parsed.tags = [];
+          if (!parsed.dailyQuests) parsed.dailyQuests = [];
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;
@@ -52,6 +56,25 @@
               entry.expAwarded = (entry.logs && entry.logs.length > 0) || !!entry.notice;
               backfilled = true;
             }
+          });
+          // デイリークエストが①の目標(entry.goals)に統合されていた旧仕様のデータを、
+          // 永続リスト(dailyQuests)に移行する。
+          parsed.history.forEach((entry) => {
+            if (!entry.goalTypes) return;
+            const dailyGoals = entry.goals.filter((g) => entry.goalTypes[g] === "daily");
+            if (dailyGoals.length === 0) return;
+            dailyGoals.forEach((g) => {
+              if (!parsed.dailyQuests.some((q) => q.text === g)) {
+                parsed.dailyQuests.push({
+                  id: "daily_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+                  text: g,
+                  lastClearedDate: null,
+                });
+              }
+              delete entry.goalTypes[g];
+            });
+            entry.goals = entry.goals.filter((g) => !dailyGoals.includes(g));
+            backfilled = true;
           });
           if (backfilled) saveState(parsed);
           return parsed;

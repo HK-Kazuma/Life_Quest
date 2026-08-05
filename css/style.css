@@ -871,6 +871,73 @@ button:hover {
   padding: 0 4px;
 }
 
+/* ---------- デイリークエスト画面 ---------- */
+.daily-quest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.daily-quest-item {
+  position: relative;
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.daily-quest-item:hover {
+  border-color: var(--dq-accent);
+}
+
+.daily-quest-item.is-selected {
+  border-color: var(--dq-accent);
+  box-shadow: 0 0 0 1px var(--dq-accent);
+}
+
+.daily-quest-item.is-cleared .daily-quest-text {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.daily-quest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.daily-quest-actions {
+  margin-top: 10px;
+}
+
+.clear-stamp {
+  position: absolute;
+  top: 50%;
+  right: 46px;
+  transform: translateY(-50%) rotate(-14deg);
+  border: 3px solid var(--dq-danger);
+  color: var(--dq-danger);
+  font-weight: bold;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* ---------- クエストボード「デイリー」タブへの案内文 ---------- */
+.quest-board-daily-note {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  color: #2a1a0c;
+  margin-bottom: 10px;
+}
+
 /* ---------- 活動記録画面 ---------- */
 .log-detail {
   opacity: 0.8;
