@@ -46,6 +46,8 @@
       worldTree: { goals: [] },
       // 宿屋：「おはよう」画面を表示済みの論理日付（1日1回だけ表示するため）。
       inn: { lastMorningShownDate: null },
+      // アーティストデート図鑑：entry = { id, text, icon, categoryId, date, createdAt }
+      artistDates: { entries: [] },
     };
   }
 
@@ -61,6 +63,7 @@
           if (parsed.character.equippedTitle === undefined) parsed.character.equippedTitle = null;
           if (parsed.character.lastSleepDate === undefined) parsed.character.lastSleepDate = null;
           if (!parsed.inn) parsed.inn = { lastMorningShownDate: null };
+          if (!parsed.artistDates) parsed.artistDates = { entries: [] };
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;

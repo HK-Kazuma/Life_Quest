@@ -12,7 +12,7 @@
   const COMMANDS = [
     { id: "quest", label: "クエスト" },
     { id: "status", label: "ステータス" },
-    { id: "map", label: "マップ", placeholder: true },
+    { id: "artistDate", label: "デート" },
     { id: "achievements", label: "実績", placeholder: true },
     { id: "calendar", label: "カレンダー" },
     { id: "inn", label: "宿屋" },
@@ -101,6 +101,8 @@
       window.Widgets.openCalendarPopup(state);
     } else if (commandId === "inn") {
       window.InnModal.open(state);
+    } else if (commandId === "artistDate") {
+      window.ArtistDateModal.open(state);
     } else {
       alert("この機能は準備中です。");
     }
