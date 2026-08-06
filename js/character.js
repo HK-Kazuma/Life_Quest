@@ -16,6 +16,7 @@
     { id: "achievements", label: "実績", placeholder: true },
     { id: "calendar", label: "カレンダー" },
     { id: "inn", label: "宿屋" },
+    { id: "pomodoro", label: "集中" },
   ];
 
   function render(state) {
@@ -103,6 +104,8 @@
       window.InnModal.open(state);
     } else if (commandId === "artistDate") {
       window.ArtistDateModal.open(state);
+    } else if (commandId === "pomodoro") {
+      window.PomodoroModal.open(state);
     } else {
       alert("この機能は準備中です。");
     }

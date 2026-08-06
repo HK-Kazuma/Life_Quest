@@ -232,7 +232,9 @@
   function init() {
     state = window.Storage.loadState();
     if (window.TagsUtil.ensureSystemTags(state)) persist();
+    if (window.Pomodoro.ensureDefaultPresets(state)) persist();
     rerenderSidebar();
+    window.Pomodoro.startClock(state);
 
     const validTabs = ["log", "dailyQuest", "history", "reset"];
     const savedTab = localStorage.getItem("adventureLogActiveTab");

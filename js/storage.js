@@ -48,6 +48,9 @@
       inn: { lastMorningShownDate: null },
       // アーティストデート図鑑：entry = { id, text, icon, categoryId, date, createdAt }
       artistDates: { entries: [] },
+      // ポモドーロタイマー：presetは自由に追加できる集中/休憩時間のセット。
+      // sessionは実行中の1回分（{presetId, label, workMinutes, breakMinutes, phase, endsAt, paused, remainingMs}）。
+      pomodoro: { presets: [], session: null },
     };
   }
 
@@ -64,6 +67,9 @@
           if (parsed.character.lastSleepDate === undefined) parsed.character.lastSleepDate = null;
           if (!parsed.inn) parsed.inn = { lastMorningShownDate: null };
           if (!parsed.artistDates) parsed.artistDates = { entries: [] };
+          if (!parsed.pomodoro) parsed.pomodoro = { presets: [], session: null };
+          if (!parsed.pomodoro.presets) parsed.pomodoro.presets = [];
+          if (parsed.pomodoro.session === undefined) parsed.pomodoro.session = null;
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;

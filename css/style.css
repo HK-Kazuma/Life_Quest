@@ -403,6 +403,46 @@ button, input, textarea, select {
   background: rgba(20, 20, 60, 1);
 }
 
+/* ---------- 集中タイマーの常駐バッジ（実行中だけ表示・レイアウトには影響させない） ---------- */
+.pomodoro-widget {
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  z-index: 50;
+}
+
+.pomodoro-widget.hidden {
+  display: none;
+}
+
+.pomodoro-widget-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(20, 20, 60, 0.9);
+  border: 2px solid var(--dq-accent);
+  color: var(--dq-text);
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.pomodoro-widget-btn:hover {
+  background: rgba(20, 20, 60, 1);
+}
+
+.pomodoro-widget-phase {
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
+
+.pomodoro-widget-timer {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--dq-accent);
+}
+
 /* ---------- タブ ---------- */
 .tabs {
   display: flex;
@@ -2085,6 +2125,108 @@ button:hover {
 .ad-detail-meta {
   font-size: 0.85rem;
   opacity: 0.7;
+}
+
+/* ---------- 集中タイマー ---------- */
+.modal-box.pomodoro-box {
+  max-width: 680px;
+}
+
+.pomo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.pomo-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 6px;
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.pomo-card-label {
+  font-weight: bold;
+}
+
+.pomo-card-detail {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.pomo-card-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: transparent;
+  border: none;
+  color: var(--dq-danger);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.85rem;
+}
+
+.pomo-card-add {
+  align-items: center;
+  justify-content: center;
+  color: var(--dq-accent);
+  border-style: dashed;
+  cursor: pointer;
+  min-height: 110px;
+}
+
+.pomo-add-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.pomo-running {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0 10px;
+}
+
+.pomo-phase-title {
+  font-size: 1.05rem;
+  color: var(--dq-accent);
+}
+
+.pomo-timer {
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.pomo-running-break .pomo-timer {
+  color: var(--dq-hp);
+}
+
+.pomo-progress-bar {
+  width: 100%;
+  max-width: 320px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.pomo-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #7effa0);
+  transition: width 1s linear;
+}
+
+.pomo-running-actions {
+  justify-content: center;
 }
 
 /* ---------- 宿屋 ---------- */

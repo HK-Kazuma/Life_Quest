@@ -342,10 +342,37 @@
     reader.readAsText(file);
   }
 
+  // 集中タイマーの実行中バッジ：右カラムのウィジェットとは別に、画面右上に固定表示する小さなボタン。
+  // レイアウトの取り合いを避けるため常時ぶんの領域は確保せず、実行中(session有り)の時だけ出す。
+  function renderPomodoroWidget(state) {
+    const box = document.getElementById("pomodoro-widget");
+    if (!box || !window.Pomodoro) return;
+    const session = window.Pomodoro.getSession(state);
+    if (!session) {
+      box.classList.add("hidden");
+      box.innerHTML = "";
+      return;
+    }
+    const remainingMs = window.Pomodoro.getRemainingMs(session);
+    const phaseLabel = session.phase === "work" ? "🚶 集中中" : "🏕️ 休憩中";
+
+    box.classList.remove("hidden");
+    box.innerHTML = `
+      <button type="button" class="pomodoro-widget-btn">
+        <span class="pomodoro-widget-phase">${phaseLabel}${session.paused ? "（一時停止）" : ""}</span>
+        <span class="pomodoro-widget-timer">${window.Pomodoro.formatMs(remainingMs)}</span>
+      </button>
+    `;
+    box.querySelector(".pomodoro-widget-btn").addEventListener("click", () => {
+      window.PomodoroModal.open(state);
+    });
+  }
+
   function render(state) {
     renderStreakWidget(state);
     renderCalendarWidget(state);
+    renderPomodoroWidget(state);
   }
 
-  window.Widgets = { render, dayTier, initBackupButton, openCalendarPopup };
+  window.Widgets = { render, dayTier, initBackupButton, openCalendarPopup, renderPomodoroWidget };
 })();
