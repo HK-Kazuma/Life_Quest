@@ -34,7 +34,7 @@
         municipalCerts: cfg.municipalCerts ?? 0,
       },
       todoList: [],
-      // history entry: { date, goals: string[], logs: {activity, detail, tags: string[]}[], notice, expGained }
+      // history entry: { date, goals: string[], goalTypes, logs: {activity, detail, tags: string[]}[], notice, expGained, removedGoalDrafts: string[] }
       history: [],
       // tag: { id, name, color }
       tags: [],
@@ -76,6 +76,10 @@
           parsed.history.forEach((entry) => {
             if (entry.expAwarded === undefined) {
               entry.expAwarded = (entry.logs && entry.logs.length > 0) || !!entry.notice;
+              backfilled = true;
+            }
+            if (!entry.removedGoalDrafts) {
+              entry.removedGoalDrafts = [];
               backfilled = true;
             }
           });

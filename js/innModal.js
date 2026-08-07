@@ -213,6 +213,35 @@
     };
   }
 
+  // 前日に受注したメイン/サブクエストのうち、実際の活動として記録されなかった
+  // （＝達成できなかった）ものを、今日のクエストとして自動的に持ち越す。
+  // 前日側の記録はそのまま残し、今日の目標としてコピーするだけなので、
+  // 履歴（過去日の記録）は変化しない。
+  function carryOverUnfinishedGoals(todayStr, yesterdayStr) {
+    const yesterdayEntry = window.App.getEntryForDate(yesterdayStr);
+    if (!yesterdayEntry || !yesterdayEntry.goals || yesterdayEntry.goals.length === 0) return;
+
+    const loggedActivities = new Set((yesterdayEntry.logs || []).map((log) => log.activity));
+    const yesterdayGoalTypes = yesterdayEntry.goalTypes || {};
+    const unfinishedGoals = yesterdayEntry.goals.filter((g) => {
+      const type = yesterdayGoalTypes[g];
+      return (type === "main" || type === "sub") && !loggedActivities.has(g);
+    });
+    if (unfinishedGoals.length === 0) return;
+
+    const todayEntry = window.App.getOrCreateEntryForDate(todayStr);
+    todayEntry.goalTypes = todayEntry.goalTypes || {};
+    let changed = false;
+    unfinishedGoals.forEach((g) => {
+      if (!todayEntry.goals.includes(g)) {
+        todayEntry.goals.push(g);
+        todayEntry.goalTypes[g] = yesterdayGoalTypes[g];
+        changed = true;
+      }
+    });
+    if (changed) window.App.persist();
+  }
+
   // アプリ起動時、まだその日の「おはよう」画面を見せていなければ表示する。
   // 前夜に宿屋で眠っていれば、翌日決めたメイン/サブクエストをそのまま見せる。
   function maybeShowMorning(state) {
@@ -235,6 +264,8 @@
 
     const yesterdayStr = window.App.shiftDateStr(todayStr, -1);
     const sleptLastNight = state.character.lastSleepDate === yesterdayStr;
+
+    carryOverUnfinishedGoals(todayStr, yesterdayStr);
 
     const todayEntry = window.App.getEntryForDate(todayStr);
     const goals = (todayEntry && todayEntry.goals) || [];

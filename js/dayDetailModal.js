@@ -46,6 +46,8 @@
       };
       entry.goals.forEach((goal) => {
         if (draftRows.some((r) => r.activity === goal)) return;
+        // 一度手動で下書きから消したクエストは、モーダルを開き直しても自動で復元しない。
+        if (entry.removedGoalDrafts && entry.removedGoalDrafts.includes(goal)) return;
         const goalType = entry.goalTypes && entry.goalTypes[goal];
         const autoTagId = autoTagByType[goalType];
         const emptyRow = draftRows.find((r) => !r.activity && !r.detail && r.tags.length === 0);
@@ -160,7 +162,15 @@
       rowsBox.querySelectorAll(".remove-draft-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           const idx = Number(btn.dataset.idx);
+          const removedActivity = draftRows[idx].activity;
           draftRows.splice(idx, 1);
+          if (entry && removedActivity && entry.goals && entry.goals.includes(removedActivity)) {
+            entry.removedGoalDrafts = entry.removedGoalDrafts || [];
+            if (!entry.removedGoalDrafts.includes(removedActivity)) {
+              entry.removedGoalDrafts.push(removedActivity);
+            }
+            window.App.persist();
+          }
           renderDraftRows();
         });
       });

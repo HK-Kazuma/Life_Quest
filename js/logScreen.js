@@ -46,6 +46,8 @@
     };
     entry.goals.forEach((goal) => {
       if (syncedGoals.has(goal)) return;
+      // 一度手動で下書きから消したクエストは、リロードしても自動で復元しない。
+      if (entry.removedGoalDrafts && entry.removedGoalDrafts.includes(goal)) return;
       syncedGoals.add(goal);
       const goalType = entry.goalTypes && entry.goalTypes[goal];
       const autoTagId = autoTagByType[goalType];
@@ -163,9 +165,18 @@
     box.querySelectorAll(".remove-draft-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = Number(btn.dataset.idx);
+        const removedActivity = draftRows[idx].activity;
         // ここで目標側(entry.goals)は変更しない。目標と実際の活動記録の差分を
         // あとから把握できるよう、活動記録側だけを消す。
         draftRows.splice(idx, 1);
+        // クエストボード由来の下書き行を消した場合は、リロード後も復元されないよう記録しておく。
+        if (removedActivity && entry.goals.includes(removedActivity)) {
+          entry.removedGoalDrafts = entry.removedGoalDrafts || [];
+          if (!entry.removedGoalDrafts.includes(removedActivity)) {
+            entry.removedGoalDrafts.push(removedActivity);
+          }
+          window.App.persist();
+        }
         renderDraftRows(entry);
       });
     });
