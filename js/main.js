@@ -40,7 +40,7 @@
   function getOrCreateEntryForDate(dateStr) {
     let entry = getEntryForDate(dateStr);
     if (!entry) {
-      entry = { date: dateStr, goals: [], logs: [], notice: "", expGained: 0, removedGoalDrafts: [] };
+      entry = { date: dateStr, goals: [], logs: [], notice: "", premortem: "", expGained: 0, removedGoalDrafts: [] };
       state.history.push(entry);
     }
     return entry;

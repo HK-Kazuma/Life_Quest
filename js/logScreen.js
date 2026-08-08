@@ -71,6 +71,14 @@
             : "今日やったこと・活動を記録しよう。"
         }</p>
 
+        <div class="notice-section premortem-section">
+          <label class="notice-label">🔮 事前検死（プレモーダル）</label>
+          <p class="premortem-hint">今日の計画が崩れるとしたら何が原因か？　例：面談前に難易度の高いクエストを終わらせる／外出中はできないクエストを先に片付ける、など。</p>
+          <textarea id="premortem-input" rows="3" placeholder="今日、計画が崩れるとしたら何が原因になりそうか。それを踏まえてどう動くか...">${escapeHtml(
+            entry.premortem || ""
+          )}</textarea>
+        </div>
+
         <div class="draft-logs" id="draft-logs"></div>
         <button id="add-log-row-btn" class="secondary-btn">＋ 活動を追加</button>
 
@@ -86,6 +94,11 @@
     `;
 
     renderDraftRows(entry);
+
+    document.getElementById("premortem-input").addEventListener("change", (e) => {
+      entry.premortem = e.target.value.trim();
+      window.App.persist();
+    });
 
     document.getElementById("add-log-row-btn").addEventListener("click", () => {
       draftRows.push({ activity: "", detail: "", tags: [] });

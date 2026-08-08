@@ -34,7 +34,7 @@
         municipalCerts: cfg.municipalCerts ?? 0,
       },
       todoList: [],
-      // history entry: { date, goals: string[], goalTypes, logs: {activity, detail, tags: string[]}[], notice, expGained, removedGoalDrafts: string[] }
+      // history entry: { date, goals: string[], goalTypes, logs: {activity, detail, tags: string[]}[], notice, premortem, expGained, removedGoalDrafts: string[] }
       history: [],
       // tag: { id, name, color }
       tags: [],
@@ -80,6 +80,10 @@
             }
             if (!entry.removedGoalDrafts) {
               entry.removedGoalDrafts = [];
+              backfilled = true;
+            }
+            if (entry.premortem === undefined) {
+              entry.premortem = "";
               backfilled = true;
             }
           });

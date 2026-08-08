@@ -76,6 +76,13 @@
         <div class="day-detail-body">
           <p class="day-detail-note">この日の記録は閲覧のみです（編集できるのは2日前までの記録です）</p>
           ${
+            entry && entry.premortem
+              ? `<div class="history-section"><div class="history-section-title">🔮 事前検死（プレモーダル）</div><p>${escapeHtml(
+                  entry.premortem
+                )}</p></div>`
+              : ""
+          }
+          ${
             goals.length
               ? `<div class="history-section"><div class="history-section-title">目標</div><ul>${goals
                   .map((g) => `<li>${escapeHtml(g)}</li>`)
@@ -102,7 +109,7 @@
               : ""
           }
           ${
-            !entry || (!goals.length && !logs.length && !entry.notice)
+            !entry || (!goals.length && !logs.length && !entry.notice && !entry.premortem)
               ? `<p class="empty-hint">この日の記録はありません</p>`
               : ""
           }
@@ -251,6 +258,13 @@
         </div>
         <div class="day-detail-body">
           <p class="day-detail-note">記録を忘れた日の活動を追記できます。連続日数にも反映されます。獲得EXPは当日に記録した場合の半分になります。</p>
+          ${
+            workingEntry.premortem
+              ? `<div class="history-section"><div class="history-section-title">🔮 事前検死（プレモーダル）</div><p>${escapeHtml(
+                  workingEntry.premortem
+                )}</p></div>`
+              : ""
+          }
           ${
             goals.length
               ? `<div class="history-section"><div class="history-section-title">目標</div><ul>${goals

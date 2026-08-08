@@ -34,6 +34,14 @@
           </summary>
           <div class="history-body">
             ${
+              entry.premortem
+                ? `<div class="history-section">
+                    <div class="history-section-title">🔮 事前検死（プレモーダル）</div>
+                    <p>${escapeHtml(entry.premortem)}</p>
+                   </div>`
+                : ""
+            }
+            ${
               entry.goals && entry.goals.length
                 ? `<div class="history-section">
                     <div class="history-section-title">目標</div>
@@ -66,7 +74,7 @@
                 : ""
             }
             ${
-              !entry.goals?.length && !entry.logs?.length && !entry.notice
+              !entry.premortem && !entry.goals?.length && !entry.logs?.length && !entry.notice
                 ? `<p class="empty-hint">この日の記録はまだありません</p>`
                 : ""
             }
