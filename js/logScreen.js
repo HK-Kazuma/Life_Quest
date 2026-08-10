@@ -4,6 +4,14 @@
   let syncedDate = null;
   let syncedGoals = new Set();
 
+  // メインクエストを常に上に表示するための並び順優先度。
+  // メイン → サブ → それ以外の活動の順（同じ区分内の順序は維持）。
+  function goalTypePriority(row) {
+    if (row.tags.includes(window.TagsUtil.SYSTEM_TAGS.main.id)) return 0;
+    if (row.tags.includes(window.TagsUtil.SYSTEM_TAGS.sub.id)) return 1;
+    return 2;
+  }
+
   function escapeHtml(str) {
     return String(str).replace(
       /[&<>"']/g,
@@ -62,6 +70,9 @@
       }
     });
 
+    // メインクエストを常に上に表示する。受注した順序に関わらず並び替える。
+    draftRows.sort((a, b) => goalTypePriority(a) - goalTypePriority(b));
+
     container.innerHTML = `
       <div class="screen-panel">
         <h2 class="screen-title">① 冒険の書（活動記録）</h2>
@@ -118,6 +129,8 @@
         ${
           entry && entry.logs.length
             ? `<div class="history-section"><div class="history-section-title">今日すでに記録した活動</div><ul>${entry.logs
+                .slice()
+                .sort((a, b) => goalTypePriority(a) - goalTypePriority(b))
                 .map(
                   (log) =>
                     `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(

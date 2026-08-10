@@ -43,7 +43,7 @@
       label: "その他",
       icons: ["✨", "🎲", "🌙", "☕", "🎪", "🃏", "🐾", "🌈"
         ,"🧑‍⚖️", "🧑‍🚀", "🧑‍🎨", "🧑‍🔬", "🧑‍🏫", "🧑‍💻", "🧑‍🍳", "🧑‍🎤","🤡"
-        ,"🎃"
+        ,"🎃","🚙"
       ],
     },
   ];
@@ -85,12 +85,27 @@
     window.App.persist();
   }
 
+  // 登録後でもアイコン・名前を編集できるようにする。
+  function updateEntry(state, entryId, { text, icon }) {
+    const entry = getEntries(state).find((e) => e.id === entryId);
+    if (!entry) return null;
+    const trimmed = text.trim();
+    if (!trimmed || !icon) return null;
+    const category = findCategoryByIcon(icon);
+    entry.text = trimmed;
+    entry.icon = icon;
+    entry.categoryId = category ? category.id : "other";
+    window.App.persist();
+    return entry;
+  }
+
   window.ArtistDate = {
     ICON_CATEGORIES,
     getEntries,
     getEntriesSorted,
     findCategoryByIcon,
     addEntry,
+    updateEntry,
     deleteEntry,
   };
 })();
