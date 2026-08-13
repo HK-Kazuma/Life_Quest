@@ -36,7 +36,7 @@
             ${
               entry.premortem
                 ? `<div class="history-section">
-                    <div class="history-section-title">🔮 事前検死（プレモーダル）</div>
+                    <div class="history-section-title">🔮 事前検死（プレモータム）</div>
                     <p>${escapeHtml(entry.premortem)}</p>
                    </div>`
                 : ""
