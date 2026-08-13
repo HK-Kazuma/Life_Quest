@@ -17,6 +17,7 @@
     { id: "calendar", label: "カレンダー" },
     { id: "inn", label: "宿屋" },
     { id: "pomodoro", label: "集中" },
+    { id: "routines", label: "ノルマ" },
   ];
 
   function render(state) {
@@ -106,6 +107,8 @@
       window.ArtistDateModal.open(state);
     } else if (commandId === "pomodoro") {
       window.PomodoroModal.open(state);
+    } else if (commandId === "routines") {
+      window.RoutinesModal.open(state);
     } else {
       alert("この機能は準備中です。");
     }

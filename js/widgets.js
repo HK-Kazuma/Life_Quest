@@ -42,8 +42,9 @@
       entry.goals.forEach((text) => {
         const type = entry.goalTypes[text];
         if (type !== "main" && type !== "sub") return;
-        const cleared = entry.logs.some((log) => log.activity === text);
-        occurrences.push({ date: entry.date, text, type, cleared });
+        const matchedLog = entry.logs.find((log) => log.activity === text);
+        const status = !matchedLog ? "none" : window.AchievementUtil.isTouch(matchedLog) ? "touch" : "full";
+        occurrences.push({ date: entry.date, text, type, status });
       });
     });
     occurrences.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
@@ -66,19 +67,60 @@
   // その日の達成度を判定する。
   // - ログが無い日: none（未記録）
   // - ログはあるが、紐づく目標が無い/未設定: recorded（薄い青）
-  // - 目標の一部がログと紐づいている: partial（普通の青）
-  // - 目標の全部がログと紐づいている: full（濃い青）
+  // - 目標の一部がフル達成/接触している: partial（普通の青）
+  // - 目標の全部がフル達成している: full（濃い青）
+  // 「接触」は「フル達成」と同じ薄い扱いでpartialに含め、未接触だけを区別する
+  // （接触を未達成として強調しない）。
   function dayTier(entry) {
     if (!entry || entry.logs.length === 0) return "none";
     if (!entry.goals || entry.goals.length === 0) return "recorded";
 
-    const achievedCount = entry.goals.filter((g) =>
-      entry.logs.some((log) => log.activity === g)
-    ).length;
+    let fullCount = 0;
+    let touchedCount = 0;
+    entry.goals.forEach((g) => {
+      const log = entry.logs.find((l) => l.activity === g);
+      if (!log) return;
+      if (window.AchievementUtil.isTouch(log)) touchedCount++;
+      else fullCount++;
+    });
 
-    if (achievedCount === entry.goals.length) return "full";
-    if (achievedCount > 0) return "partial";
+    if (fullCount === entry.goals.length) return "full";
+    if (fullCount > 0 || touchedCount > 0) return "partial";
     return "recorded";
+  }
+
+  function questHistoryStatusClass(status) {
+    if (status === "full") return "cleared";
+    if (status === "touch") return "touched";
+    return "not-cleared";
+  }
+
+  function questHistoryStatusLabel(status) {
+    if (status === "full") return "✔ クリア";
+    if (status === "touch") return "△ 接触";
+    return "未クリア";
+  }
+
+  // 今週（月曜始まり）に記録した活動の合計件数。
+  function weekActivityCount(historyByDate, todayStr) {
+    const weekStart = weekStartOf(todayStr);
+    let total = 0;
+    for (let i = 0; i < 7; i++) {
+      const entry = historyByDate[window.App.shiftDateStr(weekStart, i)];
+      if (entry) total += entry.logs.length;
+    }
+    return total;
+  }
+
+  // 直近N日（今日を含む）の1日あたり活動数の移動平均。
+  // 前日単体の落ち込みではなく、期間としての傾向で自分を見られるようにする指標。
+  function movingAverageActivities(historyByDate, todayStr, days) {
+    let total = 0;
+    for (let i = 0; i < days; i++) {
+      const entry = historyByDate[window.App.shiftDateStr(todayStr, -i)];
+      if (entry) total += entry.logs.length;
+    }
+    return total / days;
   }
 
   function renderStreakWidget(state) {
@@ -108,6 +150,10 @@
 
     // 「今日」の判定はAM4:00までを前日扱いする論理日付(window.App.todayStr)に合わせる。
     const todayStr = window.App.todayStr();
+    const weekCount = weekActivityCount(historyByDate, todayStr);
+    const avg7 = movingAverageActivities(historyByDate, todayStr, 7);
+    const avg30 = movingAverageActivities(historyByDate, todayStr, 30);
+
     const cells = [];
     const today = new Date();
     for (let i = CALENDAR_DAYS - 1; i >= 0; i--) {
@@ -119,7 +165,21 @@
     }
 
     return `
-      <div class="calendar-widget-stats">
+      <div class="calendar-widget-stats calendar-widget-stats-primary">
+        <div class="calendar-stat">
+          <div class="calendar-stat-value">${weekCount}</div>
+          <div class="calendar-stat-label">今週の活動数</div>
+        </div>
+        <div class="calendar-stat">
+          <div class="calendar-stat-value">${avg7.toFixed(1)}</div>
+          <div class="calendar-stat-label">7日移動平均</div>
+        </div>
+        <div class="calendar-stat">
+          <div class="calendar-stat-value">${avg30.toFixed(1)}</div>
+          <div class="calendar-stat-label">30日移動平均</div>
+        </div>
+      </div>
+      <div class="calendar-widget-stats calendar-widget-stats-secondary">
         <div class="calendar-stat">
           <div class="calendar-stat-value">${achievementDays}</div>
           <div class="calendar-stat-label">達成日数</div>
@@ -216,9 +276,9 @@
                         )}</span>
                         <span class="quest-history-text">${escapeHtml(occ.text)}</span>
                         <span class="quest-history-date">${occ.date}</span>
-                        <span class="quest-history-status ${
-                          occ.cleared ? "cleared" : "not-cleared"
-                        }">${occ.cleared ? "✔ クリア" : "未クリア"}</span>
+                        <span class="quest-history-status ${questHistoryStatusClass(
+                          occ.status
+                        )}">${questHistoryStatusLabel(occ.status)}</span>
                         <button type="button" class="secondary-btn quest-history-accept-btn" data-text="${escapeHtml(
                           occ.text
                         )}" data-type="${occ.type}">受注する</button>
@@ -374,5 +434,12 @@
     renderPomodoroWidget(state);
   }
 
-  window.Widgets = { render, dayTier, initBackupButton, openCalendarPopup, renderPomodoroWidget };
+  window.Widgets = {
+    render,
+    dayTier,
+    initBackupButton,
+    openCalendarPopup,
+    renderPomodoroWidget,
+    weekStartOf,
+  };
 })();

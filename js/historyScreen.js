@@ -56,7 +56,9 @@
                     <ul>${entry.logs
                       .map(
                         (log) =>
-                          `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(
+                          `<li><strong>${escapeHtml(log.activity)}</strong>${window.AchievementUtil.badgeHtml(
+                            log
+                          )}${window.TagsUtil.renderTagChips(
                             log.tags,
                             state.tags
                           )}${log.detail ? ` - ${escapeHtml(log.detail)}` : ""}</li>`

@@ -12,6 +12,9 @@
   const SYSTEM_TAGS = {
     main: { id: "tag_system_main", name: "メイン", system: true, kind: "main" },
     sub: { id: "tag_system_sub", name: "サブ", system: true, kind: "sub" },
+    // ノルマ（最低ライン）で記録した活動に自動で付くタグ。「未達成」ではなく
+    // 「ノルマ達成」として見せるための目印であり、罪悪感を煽らない色にする。
+    floor: { id: "tag_system_floor", name: "ノルマ", system: true, kind: "floor" },
   };
 
   function escapeHtml(str) {

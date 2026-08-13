@@ -1,0 +1,20 @@
+{
+  "name": "life_quest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HK-Kazuma/Life_Quest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HK-Kazuma/Life_Quest/issues"
+  },
+  "homepage": "https://github.com/HK-Kazuma/Life_Quest#readme"
+}

@@ -51,6 +51,15 @@
       // ポモドーロタイマー：presetは自由に追加できる集中/休憩時間のセット。
       // sessionは実行中の1回分（{presetId, label, workMinutes, breakMinutes, phase, endsAt, paused, remainingMs}）。
       pomodoro: { presets: [], session: null },
+      // ノルマライン：活動カテゴリごとに「理想」と、最低ここまでやればOKとする「ノルマ」を持つ。
+      // category: { id, name, idealText, floorOptions: string[] }
+      routines: { categories: [] },
+      // 週間クエスト：週(月曜始まり)ごとに目標回数(targetCount)をこなす継続クエスト。
+      // weekStart/doneCountは進行中の週の分。週が変わるとhistoryに積んでリセットする
+      // （データは消さず、実績ベースで目標を見直すための材料として残す）。
+      // quest: { id, text, targetCount, doneCount, weekStart, missedWeeksStreak,
+      //          reviewDismissedWeek, history: [{weekStart, doneCount, targetCount}] }
+      weeklyQuests: [],
     };
   }
 
@@ -70,6 +79,9 @@
           if (!parsed.pomodoro) parsed.pomodoro = { presets: [], session: null };
           if (!parsed.pomodoro.presets) parsed.pomodoro.presets = [];
           if (parsed.pomodoro.session === undefined) parsed.pomodoro.session = null;
+          if (!parsed.routines) parsed.routines = { categories: [] };
+          if (!parsed.routines.categories) parsed.routines.categories = [];
+          if (!parsed.weeklyQuests) parsed.weeklyQuests = [];
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;

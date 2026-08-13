@@ -1,6 +1,6 @@
 // ①活動記録画面（冒険の書）：活動を複数追加し、気づきを添えて記録 → EXP加算・レベルアップ判定。
 (function () {
-  let draftRows = [{ activity: "", detail: "", tags: [] }];
+  let draftRows = [{ activity: "", detail: "", tags: [], achievement: "full" }];
   let syncedDate = null;
   let syncedGoals = new Set();
 
@@ -40,8 +40,9 @@
               activity: log.activity,
               detail: log.detail || "",
               tags: log.tags ? log.tags.slice() : [],
+              achievement: window.AchievementUtil.normalize(log.achievement),
             }))
-          : [{ activity: "", detail: "", tags: [] }];
+          : [{ activity: "", detail: "", tags: [], achievement: "full" }];
       syncedGoals = new Set(entry.goals.filter((g) => draftRows.some((r) => r.activity === g)));
     }
 
@@ -66,7 +67,7 @@
         emptyRow.activity = goal;
         if (autoTagId) emptyRow.tags = [autoTagId];
       } else {
-        draftRows.push({ activity: goal, detail: "", tags: autoTagId ? [autoTagId] : [] });
+        draftRows.push({ activity: goal, detail: "", tags: autoTagId ? [autoTagId] : [], achievement: "full" });
       }
     });
 
@@ -90,6 +91,8 @@
           )}</textarea>
         </div>
 
+        ${routineCheckinHtml(state, entry.date)}
+
         <div class="draft-logs" id="draft-logs"></div>
         <button id="add-log-row-btn" class="secondary-btn">＋ 活動を追加</button>
 
@@ -112,11 +115,98 @@
     });
 
     document.getElementById("add-log-row-btn").addEventListener("click", () => {
-      draftRows.push({ activity: "", detail: "", tags: [] });
+      draftRows.push({ activity: "", detail: "", tags: [], achievement: "full" });
       renderDraftRows(entry);
     });
 
     document.getElementById("save-log-btn").addEventListener("click", () => saveLog(entry, state));
+
+    container.querySelectorAll(".routine-pick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cat = state.routines.categories.find((c) => c.id === btn.dataset.cat);
+        if (!cat) return;
+        const kind = btn.dataset.kind;
+        const text = kind === "floor" ? cat.floorOptions[Number(btn.dataset.idx)] : cat.idealText;
+        if (!text) return;
+        pickRoutine(text, kind, entry);
+      });
+    });
+  }
+
+  // 「今日はどれで行く？」チェックインで理想/ノルマを選んだときの下書き行への反映。
+  // ノルマを選んだ場合はシステムタグ「ノルマ」を付け、達成度は常にフル達成にする
+  // （ノルマ自体が最低ラインなので、選んだ時点で「未達成」ではなく「ノルマ達成」として扱う）。
+  function pickRoutine(text, kind, entry) {
+    const tags = kind === "floor" ? [window.TagsUtil.SYSTEM_TAGS.floor.id] : [];
+    const emptyRow = draftRows.find((r) => !r.activity && !r.detail && r.tags.length === 0);
+    if (emptyRow) {
+      emptyRow.activity = text;
+      emptyRow.tags = tags;
+    } else {
+      draftRows.push({ activity: text, detail: "", tags, achievement: "full" });
+    }
+    renderDraftRows(entry);
+  }
+
+  const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const WEEKDAY_WEIGHT_LABEL = { focus: "重点", light: "軽め" };
+  const WEIGHT_SORT_ORDER = { focus: 0, light: 1 };
+
+  function todayWeekdayKey(todayStr) {
+    return WEEKDAY_KEYS[new Date(todayStr + "T00:00:00").getDay()];
+  }
+
+  // カテゴリごとに「理想」「ノルマ」を選択ボタンとして並べる。カテゴリが1件も無ければ何も出さない。
+  // 曜日テンプレで「重点」が設定されている日は理想を、「軽め」の日はノルマを推奨表示にする
+  // （自動確定はせず、あくまで1クリックで選べる提案に留める）。
+  function routineCheckinHtml(state, todayStr) {
+    const categories = (state.routines && state.routines.categories) || [];
+    if (categories.length === 0) return "";
+    const dayKey = todayWeekdayKey(todayStr);
+    const sorted = categories
+      .map((cat, idx) => ({ cat, idx, weight: (cat.weekdayWeights || {})[dayKey] }))
+      .sort((a, b) => {
+        const oa = WEIGHT_SORT_ORDER[a.weight] ?? 2;
+        const ob = WEIGHT_SORT_ORDER[b.weight] ?? 2;
+        return oa !== ob ? oa - ob : a.idx - b.idx;
+      });
+
+    return `
+      <div class="routine-checkin-section">
+        <label class="notice-label">今日はどれで行く？</label>
+        <div class="routine-checkin-list">
+          ${sorted
+            .map(({ cat, weight }) => {
+              const recommendIdeal = weight === "focus";
+              const recommendFloorIdx = weight === "light" && cat.floorOptions.length ? 0 : -1;
+              return `
+            <div class="routine-checkin-row">
+              <span class="routine-checkin-name">${escapeHtml(cat.name)}${
+                weight ? `<span class="routine-weight-badge ${weight}">${WEEKDAY_WEIGHT_LABEL[weight]}</span>` : ""
+              }</span>
+              ${
+                cat.idealText
+                  ? `<button type="button" class="secondary-btn routine-pick-btn${
+                      recommendIdeal ? " is-recommended" : ""
+                    }" data-cat="${cat.id}" data-kind="ideal">${escapeHtml(cat.idealText)}</button>`
+                  : ""
+              }
+              ${cat.floorOptions
+                .map(
+                  (opt, idx) =>
+                    `<button type="button" class="secondary-btn routine-pick-btn kind-floor${
+                      idx === recommendFloorIdx ? " is-recommended" : ""
+                    }" data-cat="${cat.id}" data-kind="floor" data-idx="${idx}">${escapeHtml(
+                      opt
+                    )}（ノルマ）</button>`
+                )
+                .join("")}
+            </div>`;
+            })
+            .join("")}
+        </div>
+      </div>
+    `;
   }
 
   function renderSleepGate(container, state, todayStr) {
@@ -133,7 +223,9 @@
                 .sort((a, b) => goalTypePriority(a) - goalTypePriority(b))
                 .map(
                   (log) =>
-                    `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(
+                    `<li><strong>${escapeHtml(log.activity)}</strong>${window.AchievementUtil.badgeHtml(
+                      log
+                    )}${window.TagsUtil.renderTagChips(
                       log.tags,
                       window.App.getTags()
                     )}${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}</li>`
@@ -178,6 +270,7 @@
             ${chipsHtml}
             ${row.tags.length < 3 ? `<button type="button" class="tag-add-btn" data-row="${idx}">＋ タグ</button>` : ""}
           </div>
+          ${window.AchievementUtil.toggleHtml(idx, row.achievement)}
         </div>`;
       })
       .join("");
@@ -230,6 +323,13 @@
         renderDraftRows(entry);
       });
     });
+    box.querySelectorAll(".achievement-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.row);
+        draftRows[idx].achievement = btn.dataset.value;
+        renderDraftRows(entry);
+      });
+    });
   }
 
   // クエストボードで目標が削除されたとき、自動反映しただけの下書き行を追随して消す。
@@ -238,7 +338,7 @@
     const idx = draftRows.findIndex((r) => r.activity === goalText);
     if (idx === -1) return;
     draftRows.splice(idx, 1);
-    if (draftRows.length === 0) draftRows.push({ activity: "", detail: "", tags: [] });
+    if (draftRows.length === 0) draftRows.push({ activity: "", detail: "", tags: [], achievement: "full" });
     if (document.getElementById("draft-logs")) {
       renderDraftRows(window.App.getTodayEntry(true));
     }
@@ -259,6 +359,7 @@
       activity: row.activity.trim(),
       detail: row.detail.trim(),
       tags: row.tags.slice(),
+      achievement: window.AchievementUtil.normalize(row.achievement),
     }));
     entry.notice = notice;
 
@@ -269,7 +370,11 @@
     if (!entry.expAwarded) {
       const character = state.character;
       const streakBonus = Math.min(character.streak * 2, 20);
-      const expGained = validRows.length * 15 + (notice ? 30 : 0) + streakBonus;
+      const rowsExp = validRows.reduce(
+        (sum, row) => sum + window.AchievementUtil.rowExp(row.achievement),
+        0
+      );
+      const expGained = rowsExp + (notice ? 30 : 0) + streakBonus;
 
       entry.expGained = (entry.expGained || 0) + expGained;
       leveledUp = window.App.addExp(expGained);

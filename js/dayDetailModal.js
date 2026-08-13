@@ -34,8 +34,9 @@
             activity: log.activity,
             detail: log.detail || "",
             tags: log.tags ? log.tags.slice() : [],
+            achievement: window.AchievementUtil.normalize(log.achievement),
           }))
-        : [{ activity: "", detail: "", tags: [] }];
+        : [{ activity: "", detail: "", tags: [], achievement: "full" }];
 
     // クエストボードで受注したものの、記録し忘れて日付が変わってしまった目標は、
     // ここでも編集可能な下書き行として反映する（活動記録の当日画面と同じ救済措置）。
@@ -55,7 +56,7 @@
           emptyRow.activity = goal;
           if (autoTagId) emptyRow.tags = [autoTagId];
         } else {
-          draftRows.push({ activity: goal, detail: "", tags: autoTagId ? [autoTagId] : [] });
+          draftRows.push({ activity: goal, detail: "", tags: autoTagId ? [autoTagId] : [], achievement: "full" });
         }
       });
     }
@@ -93,7 +94,9 @@
             logs.length
               ? `<div class="history-section"><div class="history-section-title">活動</div><ul>${logs
                   .map(
-                    (log) => `<li><strong>${escapeHtml(log.activity)}</strong>${window.TagsUtil.renderTagChips(
+                    (log) => `<li><strong>${escapeHtml(log.activity)}</strong>${window.AchievementUtil.badgeHtml(
+                      log
+                    )}${window.TagsUtil.renderTagChips(
                       log.tags,
                       window.App.getTags()
                     )}${log.detail ? `<div class="log-detail">${escapeHtml(log.detail)}</div>` : ""}</li>`
@@ -156,6 +159,7 @@
               ${chipsHtml}
               ${row.tags.length < 3 ? `<button type="button" class="tag-add-btn" data-row="${idx}">＋ タグ</button>` : ""}
             </div>
+            ${window.AchievementUtil.toggleHtml(idx, row.achievement)}
           </div>`;
         })
         .join("");
@@ -205,6 +209,13 @@
           renderDraftRows();
         });
       });
+      rowsBox.querySelectorAll(".achievement-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.row);
+          draftRows[idx].achievement = btn.dataset.value;
+          renderDraftRows();
+        });
+      });
     }
 
     function save() {
@@ -217,20 +228,25 @@
         activity: row.activity.trim(),
         detail: row.detail.trim(),
         tags: row.tags.slice(),
+        achievement: window.AchievementUtil.normalize(row.achievement),
       }));
       liveEntry.notice = notice;
 
       window.App.recomputeStreak();
 
       // 新しく増えた活動・気づきの分だけ、当日記録時の半分のEXPを付与する。
+      // 新規行は「＋活動を追加」で末尾に足されるため、末尾のnewRowsCount件を新規分とみなす。
       const newRowsCount = Math.max(0, validRows.length - initialLogCount);
+      const newRowsExp = validRows
+        .slice(validRows.length - newRowsCount)
+        .reduce((sum, row) => sum + window.AchievementUtil.rowExp(row.achievement), 0);
       const noticeBonusEligible = notice !== "" && !initialHadNotice;
       const character = window.App.getState().character;
       let leveledUp = false;
 
       if (newRowsCount > 0 || noticeBonusEligible) {
         const streakBonus = Math.min(character.streak * 2, 20);
-        const fullExpGained = newRowsCount * 15 + (noticeBonusEligible ? 30 : 0) + streakBonus;
+        const fullExpGained = newRowsExp + (noticeBonusEligible ? 30 : 0) + streakBonus;
         const pastDayExpGained = Math.floor(fullExpGained / 2);
         if (pastDayExpGained > 0) {
           liveEntry.expGained = (liveEntry.expGained || 0) + pastDayExpGained;
@@ -292,7 +308,7 @@
       document.getElementById("day-detail-close").addEventListener("click", close);
       document.getElementById("day-detail-cancel").addEventListener("click", close);
       document.getElementById("day-detail-add-row-btn").addEventListener("click", () => {
-        draftRows.push({ activity: "", detail: "", tags: [] });
+        draftRows.push({ activity: "", detail: "", tags: [], achievement: "full" });
         renderDraftRows();
       });
       document.getElementById("day-detail-save").addEventListener("click", save);

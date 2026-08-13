@@ -323,6 +323,18 @@ button, input, textarea, select {
   gap: 6px;
 }
 
+.calendar-widget-stats-primary {
+  margin-bottom: 10px;
+}
+
+.calendar-widget-stats-secondary .calendar-stat-value {
+  font-size: 1.15rem;
+}
+
+.calendar-widget-stats-secondary .calendar-stat-label {
+  opacity: 0.55;
+}
+
 .calendar-stat {
   flex: 1;
   text-align: center;
@@ -494,6 +506,14 @@ button, input, textarea, select {
   margin: 0 0 16px;
   opacity: 0.8;
   font-size: 0.95rem;
+}
+
+.screen-subtitle {
+  margin: 20px 0 4px;
+  font-size: 1.1rem;
+  color: var(--dq-accent);
+  border-top: 2px dashed var(--dq-border-inner);
+  padding-top: 16px;
 }
 
 /* ---------- DQ風コマンドウィンドウ（サイドバー） ---------- */
@@ -852,6 +872,10 @@ button, input, textarea, select {
   color: var(--dq-hp);
 }
 
+.quest-history-status.touched {
+  color: var(--dq-accent);
+}
+
 .quest-history-status.not-cleared {
   opacity: 0.6;
 }
@@ -948,6 +972,11 @@ button, input, textarea, select {
 .todo-add-row {
   display: flex;
   gap: 6px;
+}
+
+.quest-board-target-input {
+  flex: 0 0 60px;
+  width: 60px;
 }
 
 input[type="text"],
@@ -1150,6 +1179,64 @@ button:hover {
   }
 }
 
+/* ---------- 週間クエスト ---------- */
+.weekly-quest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.weekly-quest-item {
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.weekly-quest-item.is-achieved {
+  border-color: var(--dq-hp);
+}
+
+.weekly-quest-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weekly-quest-text {
+  flex: 1 1 auto;
+}
+
+.weekly-quest-progress {
+  font-weight: bold;
+  color: var(--dq-accent);
+  font-size: 0.9rem;
+}
+
+.weekly-quest-tick-btn {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+}
+
+.weekly-quest-tick-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.weekly-quest-review {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--dq-border-inner);
+  font-size: 0.85rem;
+}
+
+.weekly-quest-review p {
+  margin: 0 0 8px;
+  opacity: 0.9;
+}
+
 /* ---------- クエストボード「デイリー」タブへの案内文 ---------- */
 .quest-board-daily-note {
   font-size: 0.8rem;
@@ -1203,6 +1290,11 @@ button:hover {
 .tag-chip-system-sub {
   background: linear-gradient(135deg, #cfe0ff, #4a6fa5);
   color: #0a1526;
+}
+
+.tag-chip-system-floor {
+  background: linear-gradient(135deg, #c9f0d8, #4a9a6f);
+  color: #062314;
 }
 
 .tag-chip-remove {
@@ -1338,6 +1430,41 @@ button:hover {
 .draft-log-row select {
   flex: 0 0 auto;
   width: auto;
+}
+
+.achievement-toggle {
+  flex: 1 1 100%;
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.achievement-btn {
+  background: transparent;
+  border: 2px solid var(--dq-border-inner);
+  color: var(--dq-text);
+  opacity: 0.6;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.achievement-btn.active {
+  opacity: 1;
+  border-color: var(--dq-accent);
+  color: var(--dq-accent);
+}
+
+.achievement-badge-touch {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.7rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--dq-accent);
+  color: var(--dq-accent);
+  vertical-align: middle;
 }
 
 .notice-section {
@@ -2371,6 +2498,181 @@ button:hover {
 .inn-morning-close-btn {
   margin-top: 18px;
   width: 100%;
+}
+
+/* ---------- ノルマ設定モーダル ---------- */
+.routines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.routine-category {
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.routine-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.routine-category-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--dq-danger);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.routine-ideal-line {
+  font-size: 0.82rem;
+  opacity: 0.8;
+  margin: 4px 0 8px;
+}
+
+.routine-floor-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.routine-floor-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  border-bottom: 1px dashed var(--dq-border-inner);
+  padding-bottom: 4px;
+}
+
+.routine-floor-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--dq-danger);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.routine-floor-add-row,
+.routines-add-category {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.routines-add-category {
+  margin-top: 12px;
+}
+
+.routine-weekday-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.routine-weekday-hint {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-right: 2px;
+}
+
+.routine-weekday-btn {
+  background: transparent;
+  border: 2px solid var(--dq-border-inner);
+  color: var(--dq-text);
+  opacity: 0.6;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.3;
+}
+
+.routine-weekday-btn.weight-focus {
+  opacity: 1;
+  border-color: var(--dq-accent);
+  color: var(--dq-accent);
+}
+
+.routine-weekday-btn.weight-light {
+  opacity: 1;
+  border-color: #4a9a6f;
+  color: #7effa0;
+}
+
+.routine-weekday-tag {
+  font-size: 0.62rem;
+}
+
+/* ---------- ①活動記録：今日はどれで行く？チェックイン ---------- */
+.routine-checkin-section {
+  margin: 16px 0;
+}
+
+.routine-checkin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.routine-checkin-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.routine-checkin-name {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  min-width: 90px;
+}
+
+.routine-weight-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.routine-weight-badge.focus {
+  border: 1px solid var(--dq-accent);
+  color: var(--dq-accent);
+}
+
+.routine-weight-badge.light {
+  border: 1px solid #4a9a6f;
+  color: #7effa0;
+}
+
+.routine-pick-btn {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+}
+
+.routine-pick-btn.kind-floor {
+  border-color: #4a9a6f;
+  color: #7effa0;
+}
+
+.routine-pick-btn.is-recommended {
+  box-shadow: 0 0 0 2px var(--dq-accent);
+  font-weight: bold;
 }
 
 /* ---------- レスポンシブ ---------- */
