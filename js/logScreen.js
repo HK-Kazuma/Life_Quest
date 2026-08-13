@@ -84,7 +84,7 @@
         }</p>
 
         <div class="notice-section premortem-section">
-          <label class="notice-label">🔮 事前検死（プレモーダル）</label>
+          <label class="notice-label">🔮 事前検死（プレモータム）</label>
           <p class="premortem-hint">今日の計画が崩れるとしたら何が原因か？　例：面談前に難易度の高いクエストを終わらせる／外出中はできないクエストを先に片付ける、など。</p>
           <textarea id="premortem-input" rows="3" placeholder="今日、計画が崩れるとしたら何が原因になりそうか。それを踏まえてどう動くか...">${escapeHtml(
             entry.premortem || ""
