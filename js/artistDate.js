@@ -85,8 +85,8 @@
     window.App.persist();
   }
 
-  // 登録後でもアイコン・名前を編集できるようにする。
-  function updateEntry(state, entryId, { text, icon }) {
+  // 登録後でもアイコン・名前・日付を編集できるようにする。
+  function updateEntry(state, entryId, { text, icon, date }) {
     const entry = getEntries(state).find((e) => e.id === entryId);
     if (!entry) return null;
     const trimmed = text.trim();
@@ -95,6 +95,7 @@
     entry.text = trimmed;
     entry.icon = icon;
     entry.categoryId = category ? category.id : "other";
+    if (date) entry.date = date;
     window.App.persist();
     return entry;
   }

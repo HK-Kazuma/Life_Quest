@@ -185,6 +185,9 @@
           <label class="wt-form-label" for="ad-text-input">行った場所・やったこと</label>
           <input type="text" id="ad-text-input" placeholder="例：知らない街の古本屋をのぞく" maxlength="40" value="${escapeHtml(entry.text)}" />
 
+          <label class="wt-form-label" for="ad-date-input">日付</label>
+          <input type="date" id="ad-date-input" value="${escapeHtml(entry.date)}" />
+
           <label class="wt-form-label">アイコンを選ぶ</label>
           <div class="ad-icon-picker" id="ad-icon-picker">
             ${window.ArtistDate.ICON_CATEGORIES.map(
@@ -222,8 +225,10 @@
 
       document.getElementById("ad-save-btn").addEventListener("click", () => {
         const input = document.getElementById("ad-text-input");
+        const dateInput = document.getElementById("ad-date-input");
         const hint = document.getElementById("ad-form-hint");
         const text = input.value;
+        const date = dateInput.value;
 
         if (!text.trim()) {
           hint.textContent = "行った場所・やったことを入力してください。";
@@ -233,8 +238,12 @@
           hint.textContent = "アイコンを選んでください。";
           return;
         }
+        if (!date) {
+          hint.textContent = "日付を選んでください。";
+          return;
+        }
 
-        window.ArtistDate.updateEntry(state, entry.id, { text, icon: selectedIcon });
+        window.ArtistDate.updateEntry(state, entry.id, { text, icon: selectedIcon, date });
         renderDetail(entry.id);
       });
     }
