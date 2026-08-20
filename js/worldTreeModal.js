@@ -242,17 +242,64 @@
       });
 
       document.getElementById("wt-add-milestone-btn").addEventListener("click", () => {
-        const title = prompt("追加する小さな目標を入力してください（ゴールの直前に追加されます）");
-        if (title === null) return;
-        if (window.WorldTree.addMilestone(goal, title)) {
-          window.App.persist();
-          renderRoute(goalId);
-        }
+        openAddMilestone(goal, goalId);
       });
 
       document.getElementById("wt-delete-goal-btn").addEventListener("click", () => {
         openDeleteConfirm(goal);
       });
+    }
+
+    // 小さな目標の追加はブラウザ標準のprompt()ではなく、画面内の専用ポップアップで入力する。
+    function openAddMilestone(goal, goalId) {
+      const addOverlay = document.getElementById("wt-add-milestone-overlay");
+      const addBox = document.getElementById("wt-add-milestone-box");
+      if (!addOverlay || !addBox) return;
+
+      addBox.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">小さな目標を追加</h3>
+          <button type="button" class="modal-close-btn" id="wt-add-milestone-close">✕</button>
+        </div>
+        <p class="wt-form-label">ゴールの直前に追加されます</p>
+        <input type="text" id="wt-add-milestone-input" placeholder="例：模擬試験で合格点を取る" />
+        <p class="wt-form-hint" id="wt-add-milestone-hint"></p>
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="wt-add-milestone-cancel">キャンセル</button>
+          <button type="button" class="primary-btn" id="wt-add-milestone-ok">追加する</button>
+        </div>
+      `;
+
+      function closeAdd() {
+        addOverlay.classList.add("hidden");
+        addOverlay.onclick = null;
+      }
+
+      document.getElementById("wt-add-milestone-close").addEventListener("click", closeAdd);
+      document.getElementById("wt-add-milestone-cancel").addEventListener("click", closeAdd);
+      document.getElementById("wt-add-milestone-ok").addEventListener("click", () => {
+        const input = document.getElementById("wt-add-milestone-input");
+        const hint = document.getElementById("wt-add-milestone-hint");
+        const title = input.value;
+
+        if (!title.trim()) {
+          hint.textContent = "小さな目標を入力してください。";
+          return;
+        }
+        if (window.WorldTree.addMilestone(goal, title)) {
+          window.App.persist();
+          closeAdd();
+          renderRoute(goalId);
+        } else {
+          hint.textContent = "入力内容を確認してください。";
+        }
+      });
+
+      addOverlay.classList.remove("hidden");
+      addOverlay.onclick = (e) => {
+        if (e.target === addOverlay) closeAdd();
+      };
+      document.getElementById("wt-add-milestone-input").focus();
     }
 
     // 目標削除の注意書きはブラウザ標準のconfirm()ではなく、専用ポップアップで表示する。
