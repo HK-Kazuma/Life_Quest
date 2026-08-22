@@ -37,6 +37,9 @@
       overlay.classList.add("hidden");
       overlay.onclick = null;
       box.classList.remove("is-racing");
+      // クエストボード／集中モードは背後の①活動記録タブを自動更新しないため、
+      // 閉じるタイミングでクリア状態などが反映されるよう明示的に再描画する。
+      window.App.refreshActiveScreen();
     }
 
     function progress() {

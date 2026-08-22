@@ -238,6 +238,13 @@
     localStorage.setItem("adventureLogActiveTab", name);
   }
 
+  // クエストボード／集中モードなどのモーダルは背後のタブを自動再描画しないため、
+  // モーダルを閉じたタイミングで「今表示中のタブ」だけを明示的に再描画するためのヘルパー。
+  function refreshActiveScreen() {
+    const activeBtn = document.querySelector(".tab-button.active");
+    if (activeBtn) switchScreen(activeBtn.dataset.screen);
+  }
+
   function init() {
     state = window.Storage.loadState();
     if (window.TagsUtil.ensureSystemTags(state)) persist();
@@ -283,6 +290,7 @@
     showLevelUp,
     rerenderSidebar,
     switchScreen,
+    refreshActiveScreen,
   };
 
   document.addEventListener("DOMContentLoaded", init);
