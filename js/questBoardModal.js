@@ -87,9 +87,12 @@
               : accepted
                   .map(
                     (g) => `
-                <li data-idx="${g.idx}">
-                  <span>${escapeHtml(g.text)}</span>
-                  <button class="goal-remove-btn" data-idx="${g.idx}">×</button>
+                <li data-idx="${g.idx}" class="quest-goal-focusable">
+                  <div class="quest-board-goal-row">
+                    <span>${escapeHtml(g.text)}</span>
+                    <button class="goal-remove-btn" data-idx="${g.idx}">×</button>
+                  </div>
+                  ${focusActionHtml(g.text, g.idx)}
                 </li>`
                   )
                   .join("")
@@ -109,10 +112,38 @@
           const idx = Number(btn.dataset.idx);
           const [removedGoal] = entry.goals.splice(idx, 1);
           delete entry.goalTypes[removedGoal];
+          if (entry.questProgress) delete entry.questProgress[removedGoal];
           window.App.persist();
           window.App.rerenderSidebar();
           if (window.LogScreen) window.LogScreen.removeGoalFromDrafts(removedGoal);
           renderGoalTypeView(typeId);
+        });
+      });
+
+      // メイン/サブクエストのみ、ラウンド分解して集中モードに挑める（デイリー/ウィークリーは対象外）。
+      function focusActionHtml(goalText) {
+        if (typeId !== "main" && typeId !== "sub") return "";
+        if (!window.FocusMode) return "";
+        const p = window.FocusMode.getProgress(entry, goalText);
+        if (!p) {
+          return `<button type="button" class="secondary-btn quest-focus-btn" data-goal="${encodeURIComponent(
+            goalText
+          )}">⚔ ラウンドに分解する</button>`;
+        }
+        if (p.status === "done") {
+          return `<span class="quest-focus-done-badge">✓ クリア済み（+${p.totalExpAwarded} EXP）</span>`;
+        }
+        return `<button type="button" class="secondary-btn quest-focus-btn" data-goal="${encodeURIComponent(
+          goalText
+        )}">🏃 出撃する</button>`;
+      }
+
+      document.querySelectorAll("#quest-board-list .quest-focus-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const goalText = decodeURIComponent(btn.dataset.goal);
+          if (!window.FocusModeModal) return;
+          close();
+          window.FocusModeModal.open(state, entry, goalText, typeId);
         });
       });
 

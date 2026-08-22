@@ -13,6 +13,13 @@
 
   let draftRows = [];
 
+  // 集中モードでラウンドを全て完了したクエストは、行として残しつつ達成度トグルの代わりに
+  // 「クリア済み」バッジを出す（EXPは既に付与済みなのでここでは加算しない）。logScreen.jsと同じ扱い。
+  function focusClearedProgress(entry, activityText) {
+    const qp = entry && entry.questProgress && entry.questProgress[activityText];
+    return qp && qp.status === "done" ? qp : null;
+  }
+
   function isEditableDate(dateStr) {
     const diff = window.App.daysBetween(dateStr, window.App.todayStr());
     return diff >= 1 && diff <= EDIT_WINDOW_DAYS;
@@ -48,7 +55,13 @@
       entry.goals.forEach((goal) => {
         if (draftRows.some((r) => r.activity === goal)) return;
         // 一度手動で下書きから消したクエストは、モーダルを開き直しても自動で復元しない。
-        if (entry.removedGoalDrafts && entry.removedGoalDrafts.includes(goal)) return;
+        // ただし集中モードでクリア済みのクエストは「クリア済み」表示のため必ず出す。
+        if (
+          !focusClearedProgress(entry, goal) &&
+          entry.removedGoalDrafts &&
+          entry.removedGoalDrafts.includes(goal)
+        )
+          return;
         const goalType = entry.goalTypes && entry.goalTypes[goal];
         const autoTagId = autoTagByType[goalType];
         const emptyRow = draftRows.find((r) => !r.activity && !r.detail && r.tags.length === 0);
@@ -142,6 +155,7 @@
               )}">${escapeHtml(t.name)}<button type="button" class="tag-chip-remove" data-row="${idx}" data-tag="${tagId}">✕</button></span>`;
             })
             .join("");
+          const clearedProgress = focusClearedProgress(entry, row.activity);
           return `
           <div class="draft-log-row" data-idx="${idx}">
             <input type="text" class="dd-draft-activity" placeholder="活動名（例: ランニング）" value="${escapeHtml(
@@ -159,7 +173,11 @@
               ${chipsHtml}
               ${row.tags.length < 3 ? `<button type="button" class="tag-add-btn" data-row="${idx}">＋ タグ</button>` : ""}
             </div>
-            ${window.AchievementUtil.toggleHtml(idx, row.achievement)}
+            ${
+              clearedProgress
+                ? `<div class="focus-cleared-badge">⚔ 集中モードでクリア済み（+${clearedProgress.totalExpAwarded} EXP 獲得済み）</div>`
+                : window.AchievementUtil.toggleHtml(idx, row.achievement)
+            }
           </div>`;
         })
         .join("");
@@ -239,7 +257,10 @@
       const newRowsCount = Math.max(0, validRows.length - initialLogCount);
       const newRowsExp = validRows
         .slice(validRows.length - newRowsCount)
-        .reduce((sum, row) => sum + window.AchievementUtil.rowExp(row.achievement), 0);
+        .reduce((sum, row) => {
+          if (focusClearedProgress(liveEntry, row.activity)) return sum;
+          return sum + window.AchievementUtil.rowExp(row.achievement);
+        }, 0);
       const noticeBonusEligible = notice !== "" && !initialHadNotice;
       const character = window.App.getState().character;
       let leveledUp = false;

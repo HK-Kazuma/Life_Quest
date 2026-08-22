@@ -56,7 +56,13 @@
     entry.goals.forEach((goal) => {
       if (syncedGoals.has(goal)) return;
       // 一度手動で下書きから消したクエストは、リロードしても自動で復元しない。
-      if (entry.removedGoalDrafts && entry.removedGoalDrafts.includes(goal)) return;
+      // ただし集中モードでクリア済みのクエストは「クリア済み」表示のため必ず出す。
+      if (
+        !focusClearedProgress(entry, goal) &&
+        entry.removedGoalDrafts &&
+        entry.removedGoalDrafts.includes(goal)
+      )
+        return;
       syncedGoals.add(goal);
       const goalType = entry.goalTypes && entry.goalTypes[goal];
       const autoTagId = autoTagByType[goalType];
@@ -240,6 +246,13 @@
     });
   }
 
+  // 集中モードでラウンドを全て完了したクエストは、①活動記録の行として残しつつ
+  // 達成度トグルの代わりに「クリア済み」バッジを出す（EXPは既に付与済みなのでここでは加算しない）。
+  function focusClearedProgress(entry, activityText) {
+    const qp = entry.questProgress && entry.questProgress[activityText];
+    return qp && qp.status === "done" ? qp : null;
+  }
+
   function renderDraftRows(entry) {
     const box = document.getElementById("draft-logs");
     if (!box) return;
@@ -257,6 +270,7 @@
             )}">${escapeHtml(t.name)}<button type="button" class="tag-chip-remove" data-row="${idx}" data-tag="${tagId}">✕</button></span>`;
           })
           .join("");
+        const clearedProgress = focusClearedProgress(entry, row.activity);
         return `
         <div class="draft-log-row" data-idx="${idx}">
           <input type="text" class="draft-activity" placeholder="活動名（例: ランニング）" value="${escapeHtml(
@@ -270,7 +284,11 @@
             ${chipsHtml}
             ${row.tags.length < 3 ? `<button type="button" class="tag-add-btn" data-row="${idx}">＋ タグ</button>` : ""}
           </div>
-          ${window.AchievementUtil.toggleHtml(idx, row.achievement)}
+          ${
+            clearedProgress
+              ? `<div class="focus-cleared-badge">⚔ 集中モードでクリア済み（+${clearedProgress.totalExpAwarded} EXP 獲得済み）</div>`
+              : window.AchievementUtil.toggleHtml(idx, row.achievement)
+          }
         </div>`;
       })
       .join("");
@@ -370,10 +388,11 @@
     if (!entry.expAwarded) {
       const character = state.character;
       const streakBonus = Math.min(character.streak * 2, 20);
-      const rowsExp = validRows.reduce(
-        (sum, row) => sum + window.AchievementUtil.rowExp(row.achievement),
-        0
-      );
+      // 集中モードで既にラウンドEXPを獲得済みの行は、①側の行EXPには二重に計上しない。
+      const rowsExp = validRows.reduce((sum, row) => {
+        if (focusClearedProgress(entry, row.activity)) return sum;
+        return sum + window.AchievementUtil.rowExp(row.achievement);
+      }, 0);
       const expGained = rowsExp + (notice ? 30 : 0) + streakBonus;
 
       entry.expGained = (entry.expGained || 0) + expGained;

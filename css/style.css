@@ -967,6 +967,38 @@ button, input, textarea, select {
   color: #7effa0;
 }
 
+.quest-board-box .goal-list li.quest-goal-focusable {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.quest-board-goal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.quest-focus-btn {
+  align-self: flex-start;
+  background: #f1e2bd;
+  border: 2px solid #5c3a1e;
+  color: #3f2712;
+  font-size: 0.78rem;
+  padding: 5px 10px;
+}
+
+.quest-focus-btn:hover {
+  background: #fff3d6;
+}
+
+.quest-focus-done-badge {
+  align-self: flex-start;
+  font-size: 0.78rem;
+  color: #2f6f3e;
+}
+
 /* ---------- フォーム系 共通 ---------- */
 .goal-add-row,
 .todo-add-row {
@@ -1465,6 +1497,14 @@ button:hover {
   border: 1px solid var(--dq-accent);
   color: var(--dq-accent);
   vertical-align: middle;
+}
+
+.focus-cleared-badge {
+  flex: 1 1 100%;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--dq-hp);
+  opacity: 0.9;
 }
 
 .notice-section {
@@ -2360,6 +2400,220 @@ button:hover {
 
 .pomo-running-actions {
   justify-content: center;
+}
+
+/* ---------- 集中モード ---------- */
+.modal-box.focus-mode-box {
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.modal-box.focus-mode-box.is-racing {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  justify-content: center;
+  animation: none;
+  padding: 24px;
+}
+
+.focus-round-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.focus-round-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.focus-round-num {
+  flex: 0 0 60px;
+  font-size: 0.72rem;
+  color: var(--dq-accent);
+}
+
+.focus-round-title {
+  flex: 1;
+}
+
+.focus-round-minutes {
+  flex: 0 0 56px;
+  width: 56px;
+  text-align: right;
+}
+
+.focus-round-min-label {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.focus-form-hint {
+  color: var(--dq-danger);
+  font-size: 0.8rem;
+  min-height: 1.2em;
+  margin: 4px 0;
+}
+
+.focus-race-hud {
+  width: 100%;
+  max-width: 340px;
+}
+
+.focus-flag-strip {
+  height: 6px;
+  background: repeating-linear-gradient(90deg, var(--dq-text) 0 6px, var(--dq-bg) 6px 12px);
+  border-radius: 3px;
+  margin-bottom: 18px;
+  opacity: 0.85;
+}
+
+.focus-race-title {
+  color: var(--dq-accent);
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+}
+
+.focus-race-round {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.focus-race-task {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin: 14px 0 10px;
+}
+
+.focus-timer {
+  font-size: 2.6rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  margin-bottom: 14px;
+}
+
+.focus-track {
+  width: 100%;
+  height: 14px;
+  background: #05051a;
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.focus-track-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--dq-hp), #8fffb0);
+  border-radius: 8px 0 0 8px;
+  transition: width 1s linear;
+}
+
+.focus-track-car {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  transition: left 1s linear;
+}
+
+.focus-exp-chip {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--dq-accent);
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--dq-accent);
+  border-radius: 20px;
+  padding: 5px 14px;
+  margin-bottom: 14px;
+}
+
+.focus-no-notif {
+  font-size: 0.72rem;
+  opacity: 0.55;
+}
+
+.footer-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  margin-top: 20px;
+}
+
+.focus-running-actions {
+  margin-top: 24px;
+}
+
+.banner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 16px 0;
+  width: 100%;
+}
+
+.banner-title {
+  font-size: 1.4rem;
+  color: var(--dq-accent);
+  text-shadow: 0 0 14px rgba(255, 215, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.focus-paused-title {
+  color: var(--dq-danger);
+  text-shadow: 0 0 14px rgba(255, 107, 107, 0.4);
+}
+
+.banner-sub {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.exp-float {
+  font-size: 1.4rem;
+  color: var(--dq-hp);
+  font-weight: bold;
+}
+
+.focus-paused-exp {
+  color: var(--dq-accent);
+}
+
+.mini-progress {
+  width: 70%;
+  height: 10px;
+  background: #05051a;
+  border: 2px solid var(--dq-border-inner);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 6px 0 2px;
+}
+
+.mini-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--dq-hp), #8fffb0);
+  transition: width 0.6s ease;
 }
 
 /* ---------- 宿屋 ---------- */

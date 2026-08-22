@@ -54,6 +54,10 @@
       // ノルマライン：活動カテゴリごとに「理想」と、最低ここまでやればOKとする「ノルマ」を持つ。
       // category: { id, name, idealText, floorOptions: string[] }
       routines: { categories: [] },
+      // 集中モード：メイン/サブクエストをラウンドに分解して集中実行する機能。
+      // 実行中の1ラウンド分の進行を絶対時刻ベースで保持する（タブを閉じても正しい経過時間に復帰できる）。
+      // session: { date, goalText, questType, roundIndex, roundStartedAt(epoch ms|null=一時停止中) }
+      focus: { session: null },
       // 週間クエスト：週(月曜始まり)ごとに目標回数(targetCount)をこなす継続クエスト。
       // weekStart/doneCountは進行中の週の分。週が変わるとhistoryに積んでリセットする
       // （データは消さず、実績ベースで目標を見直すための材料として残す）。
@@ -82,6 +86,8 @@
           if (!parsed.routines) parsed.routines = { categories: [] };
           if (!parsed.routines.categories) parsed.routines.categories = [];
           if (!parsed.weeklyQuests) parsed.weeklyQuests = [];
+          if (!parsed.focus) parsed.focus = { session: null };
+          if (parsed.focus.session === undefined) parsed.focus.session = null;
           // 「その日最初の記録だけXPを付与」機能の追加前からある記録には
           // expAwardedフラグが無い。既に活動やnoticeがある日はXP付与済みとみなして補完する。
           let backfilled = false;
@@ -97,6 +103,21 @@
             if (entry.premortem === undefined) {
               entry.premortem = "";
               backfilled = true;
+            }
+            if (!entry.questProgress) {
+              entry.questProgress = {};
+              backfilled = true;
+            }
+            // 集中モード導入初期版は、クエスト完了時に誤って活動記録の下書きから
+            // 除外扱い(removedGoalDrafts)にしていた。クリア済みなら「クリア済み」表示のため
+            // 復元する（以後の完了ではこの配列に追加しない）。
+            if (entry.removedGoalDrafts.length && entry.questProgress) {
+              const before = entry.removedGoalDrafts.length;
+              entry.removedGoalDrafts = entry.removedGoalDrafts.filter((goal) => {
+                const qp = entry.questProgress[goal];
+                return !(qp && qp.status === "done");
+              });
+              if (entry.removedGoalDrafts.length !== before) backfilled = true;
             }
           });
           // デイリークエストが①の目標(entry.goals)に統合されていた旧仕様のデータを、
